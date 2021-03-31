@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0a5a6a8e-dd09-41c9-b2fc-1255db28727b" name="Default Changelist" comment="" />
+    <list default="true" id="0a5a6a8e-dd09-41c9-b2fc-1255db28727b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/nginx/default.conf" beforeDir="false" afterPath="$PROJECT_DIR$/nginx/default.conf" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,7 +93,7 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="conf" value="28" />
+          <entry key="conf" value="34" />
           <entry key="py" value="5036" />
           <entry key="sh" value="19" />
           <entry key="txt" value="21" />
@@ -101,7 +103,7 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="Bash" value="19" />
-          <entry key="Logstash" value="28" />
+          <entry key="Logstash" value="34" />
           <entry key="PLAIN_TEXT" value="21" />
           <entry key="Python" value="5036" />
           <entry key="YAML" value="49" />
@@ -195,8 +197,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/nginx/default.conf">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="8" />
+            <state relative-caret-position="209">
+              <caret line="11" selection-start-line="11" selection-start-column="1" selection-end-line="14" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -686,8 +688,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/nginx/default.conf">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="20" column="8" selection-start-line="20" selection-start-column="8" selection-end-line="20" selection-end-column="8" />
+        <state relative-caret-position="209">
+          <caret line="11" selection-start-line="11" selection-start-column="1" selection-end-line="14" selection-end-column="6" />
         </state>
       </provider>
     </entry>
