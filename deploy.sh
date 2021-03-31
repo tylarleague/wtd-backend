@@ -5,4 +5,6 @@ docker-compose down && \
 rm -rf wtd-backend && \
 tar -xvf backend.tgz && \
 rm backend.tgz && \
-docker-compose up -d"
+docker-compose up -d && \
+cp wtd-backend/nginx/default.conf /var/lib/docker/volumes/wtd_wtd-nginx/_data/ && \
+docker restart nginx"
