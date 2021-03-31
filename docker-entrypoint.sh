@@ -26,5 +26,5 @@ python manage.py migrate
 
 # Start server
 echo "Starting server"
-python manage.py runserver 0.0.0.0:8000
-#gunicorn -b 0.0.0.0:8000 wtd.wsgi:application --log-level=info
+#python manage.py runserver 0.0.0.0:8000
+gunicorn -b 0.0.0.0:8000 wtd.wsgi:application --log-level=info

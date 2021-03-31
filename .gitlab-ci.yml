@@ -6,7 +6,8 @@ deploy:
     - cd ..
     - apt-get update
     - apt-get install sshpass
-    - tar -czf backend.tgz backend
+    - pwd
+    - tar -czf backend.tgz wtd-backend
     - cd wtd-backend/
     - bash deploy.sh $PASSWORD
 
