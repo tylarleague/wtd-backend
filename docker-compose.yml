@@ -1,0 +1,92 @@
+version: '3.3'
+services:
+#  nginx:
+#    image: nginx
+#    container_name: nginx
+#    restart: always
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - "./nginx/conf.d/:/etc/nginx/conf.d/"
+#      #- "./nginx/certs:/etc/nginx/certs"
+#      - type: volume
+#        source: django-static
+#        target: /code/static
+#      - type: volume
+#        source: django-uploads
+#        target: /code/media/uploads
+#    depends_on:
+#      - backend
+#      - db
+  db:
+    image: postgres
+    container_name: database
+    restart: always
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_DB=postgres"
+    ports:
+      - 5432:5432
+    volumes:
+      - type: volume
+        source: database-data
+        target: /var/lib/postgresql/data
+
+  # ejabberd:
+  #   image: ejabberd/ecs
+  #   ports:
+  #     - 5222:5222
+  #     - 5269:5269
+  #     - 5280:5280
+  #     - 5281:5281
+  #   environment:
+  #     - ERLANG_NODE=ejabberd
+  #     - XMPP_DOMAIN=example.com xyz.io
+  #     - EJABBERD_ADMINS=admin@example.com
+  #     - EJABBERD_USERS=admin@example.com:password4321 user1@xyz.io
+  #   depends_on:
+  #     - db
+  #   volumes:
+      # - database-data:/home/ejabberd/database
+      # - ./ejabberd.yml:/home/ejabberd/conf/ejabberd.yml
+      # - ./ejaberd_auth.sh:/home/ejabberd/ejaberd_auth.sh
+      # - .:/home/ejabberd/backend
+  # backend:
+  #   build: ./backend
+  #   container_name: backend
+  #   restart: always
+  #   ports:
+  #     - "1234:8000"
+  #   volumes:
+  #     - type: volume
+  #       source: django-static
+  #       target: /code/static
+  #     - type: volume
+  #       source: django-uploads
+  #       target: /code/media/
+  #   links:
+  #     - redis
+  #   depends_on:
+  #     - db
+
+#  frontend:
+#    build: ./Frontend
+#    container_name: frontend
+#    restart: always
+#    ports:
+#      - "9000:80"
+#    depends_on:
+#      - db
+#      - backend
+
+  # redis:
+  #   image: "redis:alpine"
+  #   ports:
+  #       - "6379:6379"
+
+volumes:
+  django-static:
+  django-uploads:
+  database-data:

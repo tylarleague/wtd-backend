@@ -5,10 +5,11 @@ from django.dispatch import receiver
 # from accounts.models import User
 # from notifications.models import Notification
 # from notifications.serializers import NotificationListSerializer
+from accounts.models import OperationProfile
 from orders.models import Order
 # from django.core import serializers
 # from django.forms.models import model_to_dict
-from channels.layers import get_channel_layer
+# from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 # from social.serializers import ThoughtPolymorphicSerializer, GetTextThoughtSerializer
 # from social.serializers import GetCommentSerializer, GetThoughtSerializer
@@ -29,6 +30,7 @@ response_type = 'JSON'
 correlation_id = '""'
 base_encode = True
 status_callback = 'sent'
+operation_profiles = OperationProfile.objects.all()
 # async = False
 
 @receiver(post_save, sender=Order)
@@ -40,11 +42,15 @@ def announce_status_change(sender, instance, created, **kwargs):
         print('SIGNALS: updated order', instance.status)
         if instance.status == 'open':
             print('I am suppose to update operation')
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                "update_order", {"type": "change.update_order",
-                                 "event": "Open",
-                                 "object": instance.id})
+            # channel_layer = get_channel_layer()
+            # async_to_sync(channel_layer.group_send)(
+            #     "update_order", {"type": "change.update_order",
+            #                      "event": "Open",
+            #                      "object": instance.id})
+            for operation_profile in operation_profiles:
+                print('operation_profile', operation_profile.user.phone_number)
+                sendSMS(instance.id, operation_profile.user.phone_number, "تم انشاؤه",
+                        "has been created")
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
             sendSMS(instance.id, instance.owner.user.phone_number, "تم استلامه و في انتظار الموافقة", "has been created, waiting for approval")
         elif instance.status == 'sent_to_provider':
@@ -52,18 +58,26 @@ def announce_status_change(sender, instance, created, **kwargs):
             sendSMS(instance.id, instance.provider.user.phone_number, " تم ارساله إليك من قبل وتد، رجاء تحديث الصفحة و من ثم القبول أو الرفض", "has been sent to you by Wtd, please refresh your page, then approve or decline")
         elif instance.status == 'rejected_by_provider':
             print('I am suppose to update operation')
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                "update_order", {"type": "change.update_order",
-                                 "event": "Rejected By Provider",
-                                 "object": instance.id})
+            # channel_layer = get_channel_layer()
+            # async_to_sync(channel_layer.group_send)(
+            #     "update_order", {"type": "change.update_order",
+            #                      "event": "Rejected By Provider",
+            #                      "object": instance.id})
+            for operation_profile in operation_profiles:
+                print('operation_profile', operation_profile.user.phone_number)
+                sendSMS(instance.id, operation_profile.user.phone_number, "تم رفضه من مقدم الخدمة",
+                        "has been rejected by provider")
         elif instance.status == 'approved_by_provider':
             print('I am suppose to update operation')
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                "update_order", {"type": "change.update_order",
-                                 "event": "Approved By Provider",
-                                 "object": instance.id})
+            # channel_layer = get_channel_layer()
+            # async_to_sync(channel_layer.group_send)(
+            #     "update_order", {"type": "change.update_order",
+            #                      "event": "Approved By Provider",
+            #                      "object": instance.id})
+            for operation_profile in operation_profiles:
+                print('operation_profile', operation_profile.user.phone_number)
+                sendSMS(instance.id, operation_profile.user.phone_number, "تمت الموافقة عليه من مقدم الخدمة",
+                        "has been accepted by provider")
         elif instance.status == 'scheduled':
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
             sendSMS(instance.id, instance.owner.user.phone_number, "تمت الموافقة عليه و جدولته", "has been approved and scheduled")
@@ -72,11 +86,15 @@ def announce_status_change(sender, instance, created, **kwargs):
                     "has been approved and scheduled")
         elif instance.status == 'started_by_provider':
             print('I am suppose to update operation')
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                "update_order", {"type": "change.update_order",
-                                 "event": "Started By Provider",
-                                 "object": instance.id})
+            # channel_layer = get_channel_layer()
+            # async_to_sync(channel_layer.group_send)(
+            #     "update_order", {"type": "change.update_order",
+            #                      "event": "Started By Provider",
+            #                      "object": instance.id})
+            for operation_profile in operation_profiles:
+                print('operation_profile', operation_profile.user.phone_number)
+                sendSMS(instance.id, operation_profile.user.phone_number, "بدأ من قبل مقدم الخدمة",
+                        "has been started by provider")
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
             sendSMS(instance.id, instance.owner.user.phone_number, "بدأ، سيارة الاسعاف في طريقها إليك",
                     "has been started, an ambulance is on its way to you")
@@ -91,11 +109,15 @@ def announce_status_change(sender, instance, created, **kwargs):
                         "has been canceled")
         elif instance.status == 'done':
             print('I am suppose to update operation')
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                "update_order", {"type": "change.update_order",
-                                 "event": "Delivered",
-                                 "object": instance.id})
+            # channel_layer = get_channel_layer()
+            # async_to_sync(channel_layer.group_send)(
+            #     "update_order", {"type": "change.update_order",
+            #                      "event": "Delivered",
+            #                      "object": instance.id})
+            for operation_profile in operation_profiles:
+                print('operation_profile', operation_profile.user.phone_number)
+                sendSMS(instance.id, operation_profile.user.phone_number, "تم الانتهاء منه",
+                        "has been finished")
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
             sendSMS(instance.id, instance.owner.user.phone_number, "تم الانتهاء منه",
                     "has been finished")
