@@ -87,7 +87,7 @@ class ClientProfile(models.Model):
 
 class OperationProfile(models.Model):
     user = models.OneToOneField(User, related_name="user_operation_profile", on_delete=models.CASCADE)
-
+    is_available = models.BooleanField(default=True)
     def __str__(self):
         return str(self.user.phone_number) + " - " + str(self.user.name)
 
