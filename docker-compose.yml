@@ -1,10 +1,5 @@
 version: '3.3'
 services:
-  nginx:
-    build: ./wtd-backend/nginx/
-    container_name: nginx
-    ports:
-      - "80:80"
   db:
     image: postgres
     container_name: database
@@ -47,7 +42,22 @@ services:
     restart: always
     ports:
         - "6379:6379"
+  nginx:
+    build: ./wtd-backend/nginx/
+    container_name: nginx
+    volumes:
+      - type: volume
+        source: wtd-nginx
+        target: /etc/nginx/conf.d/
+      - "/var/lib/docker/volumes/wtd_django-static/_data/:/usr/share/nginx/html/static/"
+      - "/etc/letsencrypt/live/wtd.care/cert.pem:/cert.pem"
+      - "/etc/letsencrypt/live/wtd.care/privkey.pem:/privkey.pem"
+    # - /root/wtd/wtd-backend/nginx/default.conf:/etc/nginx/conf.d/
+    ports:
+        - "80:80"         
+        - "443:443" 
 volumes:
   django-static:
   django-uploads:
   database-data:
+  wtd-nginx:
