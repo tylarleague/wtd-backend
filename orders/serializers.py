@@ -26,11 +26,11 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
 
 class GetOrdersSerializer(serializers.ModelSerializer):
-    owner = ClientSerializer()
     amb_arrival = serializers.ReadOnlyField()
     patient = PersonSerializer()
     order_related_invoice = InvoiceSerializer()
     provider = ProvidersSerializer()
+    owner = ClientSerializer()
     provider_id = serializers.PrimaryKeyRelatedField(source='provider', queryset=ProviderProfile.objects.all(), write_only=True, allow_null=True)
     order_extra_services = extraServicesSerializer(required=False, many=True, read_only=True)
     class Meta:
