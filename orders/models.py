@@ -22,7 +22,6 @@ class Order(models.Model):
     approved_by_provider = models.BooleanField(null=True, blank=True)
     notes = models.CharField(max_length=500, null=True, blank=True)
     history = HistoricalRecords()
-    test = models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.id) + " related to user: " + str(self.owner.user.name) + " w/ phone #: " + str(self.owner.user.phone_number)

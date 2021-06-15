@@ -45,7 +45,7 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
 
     path('accounts/profile/availableProviders/<order_id>', accountsViews.GetAvailableProviderView.as_view()),
     # path('accounts/profile/GetProvidelApproval/<pk>', accountsViews.GetProvidelApproval.as_view()),
-
+    path('accounts/profile/provider_change_availability/<pk>', accountsViews.UpdateProviderAvailabilityView.as_view()),
     #Order Client
     path('order/create/', ordersViews.CreateOrderView.as_view()),
     path('order/userOrders/', ordersViews.GetOrdersOfUserView.as_view()),
@@ -63,6 +63,7 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
     path('order/providerOrders/', ordersViews.GetOrdersProvider.as_view()),
     path('order/providerOrdersHistory/', ordersViews.GetDeletedDoneOrdersProvider.as_view()),
     path('order/provider_order_action/<pk>', ordersViews.ActionOrderByProvider.as_view()),
+    # path('order/provider_change_availability/<pk>', ordersViews.ActionOrderByProvider.as_view()),
 
 
     # OTP

@@ -4,7 +4,7 @@ from rest_framework.generics import RetrieveAPIView
 
 from accounts.models import User, Person, ProviderProfile
 from rest_framework import viewsets, generics, views, permissions, status
-from accounts.serializers import UserSerializer, RegistrationSerializer, PersonSerializer, ProvidersSerializer
+from accounts.serializers import UserSerializer, RegistrationSerializer, PersonSerializer, ProvidersSerializer, UpdateProviderAvailabilityViewSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -182,3 +182,10 @@ class UpdateUserPasswordView(generics.UpdateAPIView):
             instance.save()
             token = Token.objects.get(key=request.auth)
             return Response({'token': token.key, 'id': token.user_id})
+
+
+class UpdateProviderAvailabilityView(generics.UpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = UpdateProviderAvailabilityViewSerializer
+    queryset = ProviderProfile.objects.all()

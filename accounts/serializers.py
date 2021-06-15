@@ -84,10 +84,15 @@ class ProvidersSerializer(serializers.ModelSerializer):
 
 class ClientSerializer(serializers.ModelSerializer):
     # related_persons = PersonSerializer(required=False, many=True, read_only=True)
-    user = UserSerializer()
+    user = SimpleUserSerializer()
     class Meta:
         model = ClientProfile
         fields = "__all__"
+
+class UpdateProviderAvailabilityViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProviderProfile
+        fields = ['is_available']
 
 # class ProviderApprovalSerializer(serializers.ModelSerializer):
 #     # user = UserSerializer()
