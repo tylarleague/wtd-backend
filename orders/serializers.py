@@ -26,7 +26,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
 
 class GetOrdersSerializer(serializers.ModelSerializer):
-    owner = ClientProfileSerializer()
+    owner = UserSerializer()
     amb_arrival = serializers.ReadOnlyField()
     patient = PersonSerializer()
     order_related_invoice = InvoiceSerializer()

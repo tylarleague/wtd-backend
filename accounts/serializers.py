@@ -32,7 +32,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
 class ClientProfileSerializer(serializers.ModelSerializer):
     related_persons = PersonSerializer(required=False, many=True, read_only=True)
-    user= SimpleUserSerializer()
+    user = SimpleUserSerializer()
     class Meta:
         model = ClientProfile
         fields = "__all__"
