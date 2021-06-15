@@ -81,6 +81,14 @@ class ProvidersSerializer(serializers.ModelSerializer):
         model = ProviderProfile
         fields = "__all__"
 
+
+class ClientSerializer(serializers.ModelSerializer):
+    # related_persons = PersonSerializer(required=False, many=True, read_only=True)
+    user = SimpleUserSerializer()
+    class Meta:
+        model = ClientProfile
+        fields = "__all__"
+
 # class ProviderApprovalSerializer(serializers.ModelSerializer):
 #     # user = UserSerializer()
 #     # organization = OrganizationSerializer()
