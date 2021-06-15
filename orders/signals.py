@@ -100,7 +100,7 @@ def announce_status_change(sender, instance, created, **kwargs):
                     sendSMS(instance.id, operation_profile.user.phone_number, "بدأ من قبل مقدم الخدمة",
                             "has been started by provider")
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
-            sendSMS(instance.id, instance.owner.user.phone_number, "بدأ، سيارة الاسعاف في طريقها إليك",
+            sendSMS(instance.id, instance.owner.user.phone_number, "، سيارة الاسعاف في طريقها إليك",
                     "has been started, an ambulance is on its way to you")
         elif instance.status == 'canceled':
             if instance.owner:

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from accounts.models import ProviderProfile
-from accounts.serializers import ClientProfileSerializer, PersonSerializer, ProvidersSerializer
+from accounts.serializers import ClientProfileSerializer, PersonSerializer, ProvidersSerializer, UserSerializer
 from orders.models import Order, Invoice, ExtraServices
 
 class InvoiceSerializer(serializers.ModelSerializer):
@@ -26,7 +26,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
 
 class GetOrdersSerializer(serializers.ModelSerializer):
-    # owner = ClientProfileSerializer()
+    owner = ClientProfileSerializer()
     amb_arrival = serializers.ReadOnlyField()
     patient = PersonSerializer()
     order_related_invoice = InvoiceSerializer()

@@ -24,8 +24,15 @@ class OrganizationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class SimpleUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'phone_number']
+
+
 class ClientProfileSerializer(serializers.ModelSerializer):
     related_persons = PersonSerializer(required=False, many=True, read_only=True)
+    user= SimpleUserSerializer()
     class Meta:
         model = ClientProfile
         fields = "__all__"
@@ -50,6 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'name', 'phone_number', 'isVerified', 'isClient', 'isOperation', 'isProvider', 'user_client_profile', 'user_operation_profile', 'user_provider_profile']
         extra_kwargs = {'password': {'write_only': True}}
+
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

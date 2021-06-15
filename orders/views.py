@@ -41,10 +41,10 @@ class CreateOrderView(generics.CreateAPIView):
         distance_in_kilo = round(distance['rows'][0]['elements'][0]['distance']['value'] / 1000, 1);
         duration_in_minutes = round(distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0);
         order = Order.objects.get(id=serializer.data['id'])
-        if(order.need_nurse):
-            nurse_cost = 150
-        else:
-            nurse_cost = 0
+        # if(order.need_nurse):
+        #     nurse_cost = 150
+        # else:
+        #     nurse_cost = 0
         print('distance_in_kilo', distance_in_kilo)
         print('duration_in_minutes', duration_in_minutes)
         myInv = Invoice.objects.create(
@@ -53,7 +53,7 @@ class CreateOrderView(generics.CreateAPIView):
             distance_text = distance['rows'][0]['elements'][0]['distance']['text'],
             duration_value=distance['rows'][0]['elements'][0]['duration']['value'],
             duration_text=distance['rows'][0]['elements'][0]['duration']['text'],
-            cost= (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200 + nurse_cost,
+            cost= (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200,
         )
         print('myInv', myInv)
         response_serializer = GetOrdersSerializer(order)
