@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0a5a6a8e-dd09-41c9-b2fc-1255db28727b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/orders/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -125,7 +125,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/wtd/settings.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="39">
@@ -171,17 +171,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/wtd/urls.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="59" column="64" lean-forward="true" selection-start-line="59" selection-start-column="64" selection-end-line="59" selection-end-column="64" />
+            <state relative-caret-position="190">
+              <caret line="58" column="65" selection-start-line="58" selection-start-column="65" selection-end-line="58" selection-end-column="65" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/orders/serializers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="393">
-              <caret line="31" column="36" lean-forward="true" selection-start-line="31" selection-start-column="36" selection-end-line="31" selection-end-column="36" />
+            <state relative-caret-position="330">
+              <caret line="27" column="6" selection-start-line="27" selection-start-column="6" selection-end-line="27" selection-end-column="6" />
               <folding>
                 <element signature="e#0#38#0" expanded="true" />
               </folding>
@@ -216,8 +216,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/orders/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="466">
-              <caret line="191" column="39" selection-start-line="191" selection-start-column="39" selection-end-line="191" selection-end-column="39" />
+            <state relative-caret-position="256">
+              <caret line="171" column="36" selection-start-line="171" selection-start-column="36" selection-end-line="171" selection-end-column="36" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -238,7 +238,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>UpdateUserPasswordView</find>
       <find>user</find>
       <find>CustomObtainAuthToken</find>
       <find>TokenAuthentication</find>
@@ -268,6 +267,7 @@
       <find>master</find>
       <find>mastermkdir s</find>
       <find>operation_order_action</find>
+      <find>operation_send_to_amb</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -300,8 +300,8 @@
         <option value="$PROJECT_DIR$/accounts/serializers.py" />
         <option value="$PROJECT_DIR$/wtd/urls.py" />
         <option value="$PROJECT_DIR$/orders/models.py" />
-        <option value="$PROJECT_DIR$/wtd/settings.py" />
         <option value="$PROJECT_DIR$/orders/serializers.py" />
+        <option value="$PROJECT_DIR$/wtd/settings.py" />
       </list>
     </option>
   </component>
@@ -424,10 +424,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1265" height="1080" extended-state="6" />
+    <frame x="0" y="0" width="1067" height="1080" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3614064" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.43121952" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -688,27 +688,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/wtd/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="39">
-          <caret line="136" selection-start-line="136" selection-end-line="145" selection-end-column="1" />
-          <folding>
-            <element signature="e#303#312#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/wtd/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="59" column="64" lean-forward="true" selection-start-line="59" selection-start-column="64" selection-end-line="59" selection-end-column="64" />
+        <state relative-caret-position="190">
+          <caret line="58" column="65" selection-start-line="58" selection-start-column="65" selection-end-line="58" selection-end-column="65" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/orders/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="191" column="39" selection-start-line="191" selection-start-column="39" selection-end-line="191" selection-end-column="39" />
+        <state relative-caret-position="256">
+          <caret line="171" column="36" selection-start-line="171" selection-start-column="36" selection-end-line="171" selection-end-column="36" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
@@ -717,10 +707,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/orders/serializers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="393">
-          <caret line="31" column="36" lean-forward="true" selection-start-line="31" selection-start-column="36" selection-end-line="31" selection-end-column="36" />
+        <state relative-caret-position="330">
+          <caret line="27" column="6" selection-start-line="27" selection-start-column="6" selection-end-line="27" selection-end-column="6" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wtd/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="39">
+          <caret line="136" selection-start-line="136" selection-end-line="145" selection-end-column="1" />
+          <folding>
+            <element signature="e#303#312#0" expanded="true" />
           </folding>
         </state>
       </provider>
