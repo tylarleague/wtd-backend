@@ -161,25 +161,30 @@ class UpdateUserPasswordView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def update(self, request, *args, **kwargs):
-        instance = User.objects.get(phone_number=request.user.phone_number)
+        # instance = User.objects.get(phone_number=request.user.phone_number)
         # print('I am inside update password and the platform is: ', request.data['platform'])
         # if ((request.data['platform'] == 'client' and not instance.isClient) or (
         #         request.data['platform'] == 'operation' and not instance.isOperation) or (
         #         request.data['platform'] == 'provider' and not instance.isProvider)):
         #     print('I entered the condition')
         #     return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
-
+        print('yeeeees in UPDAAATE password')
+        # print('olllld pass', request.data['oldPassword'])
+        # print('request.data.keys()', request.data.keys())
         if('oldPassword' in request.data.keys()):
-            if(instance.check_password(request.data['oldPassword'])):
-                instance.set_password(request.data['newPassword'])
-                instance.save()
+            print('yeeeees in old password')
+            print('olllld pass', request.data['oldPassword'])
+            if(request.user.check_password(request.data['oldPassword'])):
+                request.user.set_password(request.data['newPassword'])
+                request.user.save()
                 token = Token.objects.get(key=request.auth)
                 return Response({'token': token.key, 'id': token.user_id})
             else:
                 return Response({'error':'Incorrect old password'}, HttpResponseNotAllowed)
+            # return Response({'error': 'Incorrect old password'}, HttpResponseNotAllowed)
         else:
-            instance.set_password(request.data['newPassword'])
-            instance.save()
+            request.user.set_password(request.data['newPassword'])
+            request.user.save()
             token = Token.objects.get(key=request.auth)
             return Response({'token': token.key, 'id': token.user_id})
 
