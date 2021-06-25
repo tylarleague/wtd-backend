@@ -4,6 +4,9 @@ from simple_history.models import HistoricalRecords
 from accounts.models import ClientProfile, Person, ProviderProfile
 from django.contrib.postgres.fields import JSONField
 from datetime import datetime, timedelta
+from django.utils import timezone
+
+
 class Order(models.Model):
     owner = models.ForeignKey(
         ClientProfile, related_name="owner_related_orders", on_delete=models.CASCADE)
@@ -22,6 +25,25 @@ class Order(models.Model):
     approved_by_provider = models.BooleanField(null=True, blank=True)
     notes = models.CharField(max_length=500, null=True, blank=True)
     history = HistoricalRecords()
+    # special_id = models.CharField(max_length=255, null=True, default=None)
+
+    # def save(self, *args, **kwargs):
+    #     if not self.special_id:
+    #         prefix = 'WTD{}'.format(timezone.now().strftime('%y%m%d')
+    #         prev_instances = self.__class__.objects.filter(special_id__contains=prefix))
+    #         if prev_instances.exists():
+    #             last_instance_id = prev_instances.last().special_id[-4:]
+    #             self.special_id = prefix + '{0:04d}'.format(int(last_instance_id) + 1)
+    #         else:
+    #             self.special_id = prefix + '{0:04d}'.format(1)
+    #     super(Order, self).save(*args, **kwargs)
+    # def save(self, flag=True, *args, **kwargs):
+    #     # Save your object. After this line, value of custom_id will be 0 which is default value
+    #     super(Order, self).save(flag=True, *args, **kwargs)
+    #     # Here value of custom_id will be updated according to your id value
+    #     if flag:
+    #         self.custom_id = 'WTD{}{}'.format(timezone.now().strftime('%y%m%d'), self.id)
+    #         self.save(flag=False, *args, **kwargs)
 
     def __str__(self):
         return str(self.id) + " related to user: " + str(self.owner.user.name) + " w/ phone #: " + str(self.owner.user.phone_number)
@@ -36,6 +58,15 @@ class Order(models.Model):
 
         return (my_arrival_time - timedelta(seconds=self.order_related_invoice.duration_value)).time()
 
+    @property
+    def custom_id(self):
+        # print('self.arrival_time', str(self.arrival_time))
+        # print("teeest", datetime.strptime(str(self.arrival_time), "%H:%M:%S"))
+        # my_arrival_time = datetime.strptime(str(self.arrival_time), "%H:%M:%S")
+        # print('SEEECONDS', self.order_related_invoice.duration_value)
+        # print('mytest', my_arrival_time - timedelta(seconds=self.order_related_invoice.duration_value))
+        return 'WTD{}{}'.format(datetime.strftime(self.order_date, '%y%m%d'), self.id)
+        # return (my_arrival_time - timedelta(seconds=self.order_related_invoice.duration_value)).time()
 
 class Invoice(models.Model):
     order = models.OneToOneField(

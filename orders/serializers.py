@@ -10,6 +10,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class OrderSerializer(serializers.ModelSerializer):
+    custom_id = serializers.ReadOnlyField()
     class Meta:
         model = Order
         fields = "__all__"
@@ -20,6 +21,7 @@ class extraServicesSerializer(serializers.ModelSerializer):
         fields = ['service_cost', 'service_name']
 
 class CreateOrderSerializer(serializers.ModelSerializer):
+    custom_id = serializers.ReadOnlyField()
     class Meta:
         model = Order
         fields = "__all__"
@@ -27,6 +29,7 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
 class GetOrdersSerializer(serializers.ModelSerializer):
     amb_arrival = serializers.ReadOnlyField()
+    custom_id = serializers.ReadOnlyField()
     patient = PersonSerializer()
     order_related_invoice = InvoiceSerializer()
     provider = ProvidersSerializer()
