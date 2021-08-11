@@ -134,22 +134,22 @@ EMAIL_HOST_PASSWORD = os.getenv('USER_EMAIL_PASSWORD', 'QAZqaz@123')
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 #
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('database', 'postgres'),
-#         'USER': os.getenv('username', 'postgres'),
-#         'PASSWORD': os.getenv('password', 'postgresPass'),
-#         'HOST': os.getenv('host', 'db'),
-#         'PORT': os.getenv('port', '5432'),
-#     }
-# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('database', 'postgres'),
+        'USER': os.getenv('username', 'postgres'),
+        'PASSWORD': os.getenv('password', 'postgresPass'),
+        'HOST': os.getenv('host', 'db'),
+        'PORT': os.getenv('port', '5432'),
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 
 # Password validation
