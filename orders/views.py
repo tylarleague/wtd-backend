@@ -1,18 +1,19 @@
 import googlemaps as googlemaps
 from django.shortcuts import render
 import math
-
+from rest_framework import views, permissions, status
 # Create your views here.
 from googlemaps.distance_matrix import distance_matrix
 from rest_framework import viewsets, generics
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
-
+import http.client
 from orders.models import Order, Invoice, ExtraServices
 from orders.serializers import OrderSerializer, CreateOrderSerializer, GetOrdersSerializer, extraServicesSerializer
 from rest_framework.response import Response
-
-
+import requests
+import json
 class OrderViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -107,7 +108,7 @@ class GetOrdersOperation(generics.ListAPIView):
         # thoughts_user_can_view = user.user_can_view.values().values_list('id', flat=True)
         # friends_list = Friend.objects.friends(user)
         not_wanted_status = ['done', 'canceled']
-        return Order.objects.filter(approved_by_client=True).exclude(status__in=not_wanted_status).order_by('order_date', 'arrival_time')
+        return Order.objects.filter(approved_by_client=True, payment_authorized=True).exclude(status__in=not_wanted_status).order_by('order_date', 'arrival_time')
 
 
 class GetDeletedDoneOrdersOperation(generics.ListAPIView):
@@ -140,7 +141,7 @@ class GetOrdersProvider(generics.ListAPIView):
         # thoughts_user_can_view = user.user_can_view.values().values_list('id', flat=True)
         # friends_list = Friend.objects.friends(user)
         not_wanted_status = ['done', 'canceled']
-        return Order.objects.filter(provider=self.request.user.user_provider_profile, approved_by_client=True).exclude(status__in=not_wanted_status).order_by('-created_at')
+        return Order.objects.filter(provider=self.request.user.user_provider_profile, approved_by_client=True, payment_authorized=True).exclude(status__in=not_wanted_status).order_by('-created_at')
 
 
 class GetDeletedDoneOrdersProvider(generics.ListAPIView):
@@ -191,3 +192,19 @@ class ActionOrderByOperation(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = GetOrdersSerializer
     queryset = Order.objects.all()
+
+
+class paymentInfo_view(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, paymentId):
+        if paymentId:
+            try:
+                url = "https://api.tap.company/v2/authorize/" + paymentId
+                payload = "{}"
+                headers = {'authorization': 'Bearer sk_test_g5nBLfJUcuVE9mkTKezvlxMF'}
+                response = requests.request("GET", url, data=payload, headers=headers)
+            except Exception as e:
+                print('errror', e)
+                return Response(e)
+        return Response(response.text)

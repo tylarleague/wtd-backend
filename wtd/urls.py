@@ -50,8 +50,11 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
     path('order/create/', ordersViews.CreateOrderView.as_view()),
     path('order/userOrders/', ordersViews.GetOrdersOfUserView.as_view()),
     path('order/userDeletedDoneOrders/', ordersViews.GetDeletedDoneOrdersOfUserView.as_view()),
-    path('order/client_approve/<pk>', ordersViews.ApproveOrderByClient.as_view()),
+    path('order/client_action/<pk>', ordersViews.ApproveOrderByClient.as_view()),
     path('order/extraServices/', ordersViews.GetExtraServicesView.as_view()),
+    path('order/payment_info/<str:paymentId>', ordersViews.paymentInfo_view.as_view(), name="payment_info"),
+
+
 
     # Order Operation
     path('order/operationOrders/', ordersViews.GetOrdersOperation.as_view()),
@@ -71,4 +74,6 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
          otpViews.OTPAuthentication.as_view(), name="otp-login"),
     path('accounts/otp/', otpViews.OTPAuthentication.as_view(), name="otp"),
     path('accounts/reset/token/', otpViews.resetPasswordToken.as_view(), name="reset-password-token"),
+
+    # order/payment_info
 ]

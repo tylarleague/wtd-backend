@@ -19,6 +19,7 @@ class Order(models.Model):
     status = models.CharField(max_length=50, default="open")
     created_at = models.DateTimeField(auto_now_add=True)
     approved_by_client = models.BooleanField(default=False)
+    payment_authorized = models.BooleanField(default=False)
     # need_nurse = models.BooleanField(default=False)
     provider = models.ForeignKey(
         ProviderProfile, related_name="provider_related_orders", on_delete=models.CASCADE, null=True, blank=True)
@@ -60,13 +61,13 @@ class Order(models.Model):
 
     @property
     def custom_id(self):
-        # print('self.arrival_time', str(self.arrival_time))
-        # print("teeest", datetime.strptime(str(self.arrival_time), "%H:%M:%S"))
-        # my_arrival_time = datetime.strptime(str(self.arrival_time), "%H:%M:%S")
-        # print('SEEECONDS', self.order_related_invoice.duration_value)
-        # print('mytest', my_arrival_time - timedelta(seconds=self.order_related_invoice.duration_value))
-        return 'WTD{}{}'.format(datetime.strftime(self.order_date, '%y%m%d'), self.id)
-        # return (my_arrival_time - timedelta(seconds=self.order_related_invoice.duration_value)).time()
+        print(self)
+        if(self):
+            return 'WTD{}{}'.format(datetime.strftime(self.order_date, '%y%m%d'), self.id)
+        return None
+    # return 'WTD{}{}'.format(datetime.strptime(str(self.arrival_time), "%H:%M:%S"), self.id)
+    # datetime.strptime(str(self.arrival_time), "%H:%M:%S")
+        # return 'WTD{}{}'.format(self.id, self.id)
 
 class Invoice(models.Model):
     order = models.OneToOneField(
