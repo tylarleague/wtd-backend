@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 from django.shortcuts import render
 from rest_framework.generics import RetrieveAPIView
 
-from accounts.models import User, Person, ProviderProfile
+from accounts.models import User, Person, ProviderProfile, ClientProfile
 from rest_framework import viewsets, generics, views, permissions, status
-from accounts.serializers import UserSerializer, RegistrationSerializer, PersonSerializer, ProvidersSerializer, UpdateProviderAvailabilityViewSerializer
+from accounts.serializers import UserSerializer, RegistrationSerializer, PersonSerializer, ProvidersSerializer, UpdateProviderAvailabilityViewSerializer, ClientProfileSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -32,6 +32,14 @@ class PersonViewSet(viewsets.ModelViewSet):
     queryset = Person.objects.all()
     serializer_class = PersonSerializer
 
+class AllClientProfilesView(generics.ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = ClientProfileSerializer
+
+    def get_queryset(self):
+        return ClientProfile.objects.all()
+
 
 class GetPersonsOfUserView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
@@ -45,6 +53,9 @@ class GetPersonsOfUserView(generics.ListAPIView):
         # print(user)
         # thoughts_user_can_view = user.user_can_view.values().values_list('id', flat=True)
         # friends_list = Friend.objects.friends(user)
+        if self.kwargs['phone_number']:
+            needed_user = User.objects.get(phone_number=self.kwargs['phone_number'])
+            return Person.objects.filter(profile=needed_user.user_client_profile)
         return Person.objects.filter(profile=self.request.user.user_client_profile)
 
     # GetAvailableProvider

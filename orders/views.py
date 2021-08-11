@@ -60,6 +60,33 @@ class CreateOrderView(generics.CreateAPIView):
         response_serializer = GetOrdersSerializer(order)
         return Response(response_serializer.data)
 
+@api_view(['POST', ])
+def calculateCost_view(request):
+
+    if request.method == 'POST':
+        # print('from_location', request.data['from_location'])
+        # print('register request.data', request.data['from_location'])
+        # print('request.data', request.data)
+        from_location = eval(request.data['from_location'])
+        to_location = eval(request.data['to_location'])
+        gmaps = googlemaps.Client(key='AIzaSyDVWqaOxUtds5e2z9OBWf79q5IASU7uBIs')
+        distance = gmaps.distance_matrix((from_location['lat'], from_location['lng']),
+                                         (to_location['lat'], to_location['lng']), mode='driving')
+        print('distance', type(distance))
+        distance_in_kilo = round(distance['rows'][0]['elements'][0]['distance']['value'] / 1000, 1);
+        duration_in_minutes = round(distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0);
+        cost= (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+        print('distance_in_kilo', distance_in_kilo)
+        print('duration_in_minutes', duration_in_minutes)
+        data = {
+            "distance": distance_in_kilo,
+            "duration": duration_in_minutes,
+            "total": cost
+
+        }
+        return Response(data)
+
+
 class GetOrdersOfUserView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

@@ -38,7 +38,9 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
     path('accounts/register/', accountsViews.registration_view, name="register"),
     path('accounts/login/', accountsViews.CustomObtainAuthToken.as_view(), name="login"),
     path('accounts/reset/password', accountsViews.UpdateUserPasswordView.as_view()),
+    path('accounts/profile/allClientProfiles/', accountsViews.AllClientProfilesView.as_view()),
     path('accounts/profile/persons/', accountsViews.GetPersonsOfUserView.as_view()),
+    path('accounts/profile/persons/<str:phone_number>', accountsViews.GetPersonsOfUserView.as_view()),
     path('accounts/profile/create/persons/', accountsViews.CreatePersonView.as_view()),
     path('accounts/profile/update/persons/<pk>', accountsViews.UpdatePersonView.as_view()),
     path('accounts/profile/delete/persons/<pk>', accountsViews.DeletePersonView.as_view()),
@@ -53,7 +55,7 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
     path('order/client_action/<pk>', ordersViews.ApproveOrderByClient.as_view()),
     path('order/extraServices/', ordersViews.GetExtraServicesView.as_view()),
     path('order/payment_info/<str:paymentId>', ordersViews.paymentInfo_view.as_view(), name="payment_info"),
-
+    path('order/calculateCost/', ordersViews.calculateCost_view, name="calculate_cost"),
 
 
     # Order Operation
