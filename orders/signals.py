@@ -124,7 +124,7 @@ def announce_status_change(sender, instance, created, **kwargs):
                     sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم الانتهاء منه",
                             "has been finished")
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
-            sendSMS(instance.id, instance.owner.user.phone_number, "تم الانتهاء منه",
+            sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم الانتهاء منه",
                     "has been finished")
         else:
             print('Unknown status at Signals')
