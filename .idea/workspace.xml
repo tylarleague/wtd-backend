@@ -1,55 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0a5a6a8e-dd09-41c9-b2fc-1255db28727b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/wtd-backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/wtd-backend.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accounts/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/automat-visualize" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/automat-visualize" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/celery" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/celery" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/cftp" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/cftp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/chardetect" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/chardetect" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/ckeygen" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/ckeygen" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/conch" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/conch" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/daphne" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/daphne" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/django-admin" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/django-admin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/django-admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/django-admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/doesitcache" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/doesitcache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/jp.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/jp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/mailmail" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/mailmail" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/pip" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/pip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/pip3" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/pip3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/pyhtmlizer" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/pyhtmlizer" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2html.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2html.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2html4.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2html4.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2html5.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2html5.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2latex.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2latex.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2man.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2man.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2odt.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2odt.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2odt_prepstyles.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2odt_prepstyles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2pseudoxml.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2pseudoxml.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2s5.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2s5.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2xetex.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2xetex.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rst2xml.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rst2xml.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/rstpep2html.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/rstpep2html.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/sqlformat" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/sqlformat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/tkconch" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/tkconch" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/trial" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/trial" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/twist" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/twist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/twistd" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/twistd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/wamp" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/wamp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/bin/xbrnetwork" beforeDir="false" afterPath="$PROJECT_DIR$/env/bin/xbrnetwork" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orders/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orders/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orders/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orders/signals.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/signals.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orders/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wtd/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/wtd/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wtd/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/wtd/urls.py" afterDir="false" />
-    </list>
+    <list default="true" id="0a5a6a8e-dd09-41c9-b2fc-1255db28727b" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -293,7 +245,7 @@
       <workItem from="1630625892043" duration="44000" />
       <workItem from="1630916026467" duration="5537000" />
       <workItem from="1631352998272" duration="7501000" />
-      <workItem from="1631453738524" duration="4422000" />
+      <workItem from="1631453738524" duration="4732000" />
     </task>
     <servers />
   </component>
