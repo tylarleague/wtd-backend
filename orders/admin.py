@@ -1,11 +1,12 @@
 from django.contrib import admin
 
 # Register your models here.
-from orders.models import Order, Invoice, ExtraServices
+from orders.models import Order, Invoice, ExtraServices, AmbReport
 
 # admin.site.register(Order)
 admin.site.register(Invoice)
 admin.site.register(ExtraServices)
+admin.site.register(AmbReport)
 
 
 

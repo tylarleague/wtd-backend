@@ -1,4 +1,4 @@
-#!/Users/aalmadani/Documents/Personal/Wtd-Project/wtd-backend/env/bin/python3
+#!/Users/aalmadani/Documents/Wtd-Project/wtd-backend/env/bin/python
 
 # $Id: rst2html4.py 7994 2016-12-10 17:41:45Z milde $
 # Author: David Goodger <goodger@python.org>

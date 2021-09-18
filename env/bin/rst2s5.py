@@ -1,4 +1,4 @@
-#!/Users/aalmadani/Documents/Personal/Wtd-Project/wtd-backend/env/bin/python3
+#!/Users/aalmadani/Documents/Wtd-Project/wtd-backend/env/bin/python
 
 # $Id: rst2s5.py 4564 2006-05-21 20:44:42Z wiemann $
 # Author: Chris Liechti <cliechti@gmx.net>

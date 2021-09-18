@@ -1,4 +1,4 @@
-#!/Users/aalmadani/Documents/Personal/Wtd-Project/wtd-backend/env/bin/python3
+#!/Users/aalmadani/Documents/Wtd-Project/wtd-backend/env/bin/python
 
 import sys
 import json

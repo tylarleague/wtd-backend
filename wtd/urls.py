@@ -18,6 +18,7 @@ from django.urls import include, path
 from rest_framework import routers
 from accounts import views as accountsViews
 from orders import views as ordersViews
+from payments import views as paymentsView
 from wtd import settings
 from rest_framework import permissions
 from django.conf.urls.static import static
@@ -40,7 +41,7 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
     path('accounts/reset/password', accountsViews.UpdateUserPasswordView.as_view()),
     path('accounts/profile/allClientProfiles/', accountsViews.AllClientProfilesView.as_view()),
     path('accounts/profile/persons/', accountsViews.GetPersonsOfUserView.as_view()),
-    path('accounts/profile/persons/<str:phone_number>', accountsViews.GetPersonsOfUserView.as_view()),
+    path('accounts/profile/persons/<str:phone_number>', accountsViews.GetPersonsOfUserViewByPhone.as_view()),
     path('accounts/profile/create/persons/', accountsViews.CreatePersonView.as_view()),
     path('accounts/profile/update/persons/<pk>', accountsViews.UpdatePersonView.as_view()),
     path('accounts/profile/delete/persons/<pk>', accountsViews.DeletePersonView.as_view()),
@@ -68,6 +69,8 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
     path('order/providerOrders/', ordersViews.GetOrdersProvider.as_view()),
     path('order/providerOrdersHistory/', ordersViews.GetDeletedDoneOrdersProvider.as_view()),
     path('order/provider_order_action/<pk>', ordersViews.ActionOrderByProvider.as_view()),
+    path('order/send_report/<pk>', ordersViews.UpdateAmbReport.as_view()),
+
     # path('order/provider_change_availability/<pk>', ordersViews.ActionOrderByProvider.as_view()),
 
 
@@ -78,4 +81,7 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
     path('accounts/reset/token/', otpViews.resetPasswordToken.as_view(), name="reset-password-token"),
 
     # order/payment_info
+
+    #Payment
+    path('payment/pay/', paymentsView.pay_view, name="pay"),
 ]

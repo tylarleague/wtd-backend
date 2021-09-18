@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'otp.apps.OtpConfig',
     # 'channels',
     'simple_history',
+    'payments',
 ]
 
 REST_FRAMEWORK = {

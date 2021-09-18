@@ -9,8 +9,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 import http.client
-from orders.models import Order, Invoice, ExtraServices
-from orders.serializers import OrderSerializer, CreateOrderSerializer, GetOrdersSerializer, extraServicesSerializer
+from orders.models import Order, Invoice, ExtraServices, AmbReport
+from orders.serializers import OrderSerializer, CreateOrderSerializer, GetOrdersSerializer, extraServicesSerializer, UpdateAmbReportSerializer
 from rest_framework.response import Response
 import requests
 import json
@@ -48,15 +48,20 @@ class CreateOrderView(generics.CreateAPIView):
         #     nurse_cost = 0
         print('distance_in_kilo', distance_in_kilo)
         print('duration_in_minutes', duration_in_minutes)
+        cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+        cost_after_vat = (115 * cost) / 100
+        print('cost_after_vat', cost_after_vat)
         myInv = Invoice.objects.create(
             order=order,
             distance_value=distance['rows'][0]['elements'][0]['distance']['value'],
             distance_text = distance['rows'][0]['elements'][0]['distance']['text'],
             duration_value=distance['rows'][0]['elements'][0]['duration']['value'],
             duration_text=distance['rows'][0]['elements'][0]['duration']['text'],
-            cost= (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200,
+            cost= cost_after_vat,
         )
+        report = AmbReport.objects.create(order=order)
         print('myInv', myInv)
+        print('report', report)
         response_serializer = GetOrdersSerializer(order)
         return Response(response_serializer.data)
 
@@ -78,10 +83,12 @@ def calculateCost_view(request):
         cost= (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
         print('distance_in_kilo', distance_in_kilo)
         print('duration_in_minutes', duration_in_minutes)
+        cost_after_vat = (115 * cost) / 100
+        print('cost_after_vat', cost_after_vat)
         data = {
             "distance": distance_in_kilo,
             "duration": duration_in_minutes,
-            "total": cost
+            "total": cost_after_vat
 
         }
         return Response(data)
@@ -199,6 +206,12 @@ class SendOrderToAmbView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = GetOrdersSerializer
     queryset = Order.objects.all()
+
+class UpdateAmbReport(generics.UpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = UpdateAmbReportSerializer
+    queryset = AmbReport.objects.all()
 
 class GetExtraServicesView(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]

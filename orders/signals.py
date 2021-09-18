@@ -6,7 +6,7 @@ from django.dispatch import receiver
 # from notifications.models import Notification
 # from notifications.serializers import NotificationListSerializer
 from accounts.models import OperationProfile
-from orders.models import Order
+from orders.models import Order, AmbReport
 # from django.core import serializers
 # from django.forms.models import model_to_dict
 # from channels.layers import get_channel_layer
@@ -38,6 +38,10 @@ def announce_status_change(sender, instance, created, **kwargs):
     print('INSTANCE: ', "966" + instance.owner.user.phone_number)
     if created:
             print('SIGNALS: created new order', instance.status)
+            if instance.payment_authorized:
+                print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم استلامه و في انتظار الموافقة",
+                        "has been created, waiting for approval")
     else:
         print('SIGNALS: updated order', instance.status)
         if instance.status == 'open' and instance.payment_authorized:

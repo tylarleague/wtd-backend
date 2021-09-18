@@ -1,4 +1,4 @@
-#!/Users/aalmadani/Documents/Personal/Wtd-Project/wtd-backend/env/bin/python3
+#!/Users/aalmadani/Documents/Wtd-Project/wtd-backend/env/bin/python
 
 # $Id: rst2latex.py 5905 2009-04-16 12:04:49Z milde $
 # Author: David Goodger <goodger@python.org>

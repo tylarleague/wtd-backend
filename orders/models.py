@@ -25,6 +25,9 @@ class Order(models.Model):
         ProviderProfile, related_name="provider_related_orders", on_delete=models.CASCADE, null=True, blank=True)
     approved_by_provider = models.BooleanField(null=True, blank=True)
     notes = models.CharField(max_length=500, null=True, blank=True)
+    health_institution = models.BooleanField(default=False)
+    appointment_approval = models.FileField(
+        upload_to='appointment_approvals', null=True, blank=True)
     history = HistoricalRecords()
     # special_id = models.CharField(max_length=255, null=True, default=None)
 
@@ -82,6 +85,19 @@ class Invoice(models.Model):
     def __str__(self):
         return str(self.id) + " related to order: " + str(self.order.id)
 
+class AmbReport(models.Model):
+    order = models.OneToOneField(
+        Order, related_name="order_related_report", on_delete=models.CASCADE)
+    history = models.CharField(max_length=2000, null=True, blank=True)
+    temp = models.CharField(max_length=100, null=True, blank=True)
+    oxygen = models.CharField(max_length=100, null=True, blank=True)
+    BP = models.CharField(max_length=100, null=True, blank=True)
+    pulse = models.CharField(max_length=100, null=True, blank=True)
+    infectious_diseases = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return str(self.id) + " related to order: " + str(self.order.id)
 
 class ExtraServices(models.Model):
     service_name = models.CharField(max_length=100)

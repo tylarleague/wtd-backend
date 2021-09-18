@@ -74,6 +74,7 @@ class Organization(models.Model):
     # user = models.OneToOneField(User, related_name="user_provider_profile", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     location = JSONField(null=True, blank=True)
+    percentage = models.IntegerField(default=70)
 
     def __str__(self):
         return str(self.name)

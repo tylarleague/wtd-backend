@@ -41,7 +41,7 @@ class AllClientProfilesView(generics.ListAPIView):
         return ClientProfile.objects.all()
 
 
-class GetPersonsOfUserView(generics.ListAPIView):
+class GetPersonsOfUserViewByPhone(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = PersonSerializer
@@ -53,9 +53,21 @@ class GetPersonsOfUserView(generics.ListAPIView):
         # print(user)
         # thoughts_user_can_view = user.user_can_view.values().values_list('id', flat=True)
         # friends_list = Friend.objects.friends(user)
+        print('teeeeeest')
+        print('self.kwargs[phone_number]', self.kwargs['phone_number'])
         if self.kwargs['phone_number']:
             needed_user = User.objects.get(phone_number=self.kwargs['phone_number'])
             return Person.objects.filter(profile=needed_user.user_client_profile)
+        return Person.objects.filter(profile=self.request.user.user_client_profile)
+
+class GetPersonsOfUserView(generics.ListAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PersonSerializer
+
+        # pagination_class = PageNumberPagination
+
+    def get_queryset(self):
         return Person.objects.filter(profile=self.request.user.user_client_profile)
 
     # GetAvailableProvider
