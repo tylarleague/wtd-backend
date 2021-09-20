@@ -3,19 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0a5a6a8e-dd09-41c9-b2fc-1255db28727b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accounts/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accounts/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orders/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orders/signals.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/signals.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orders/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/otp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/otp/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/otp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/otp/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/payments/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/payments/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/payments/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/payments/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wtd/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/wtd/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wtd/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/wtd/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -260,7 +248,7 @@
       <workItem from="1630625892043" duration="44000" />
       <workItem from="1630916026467" duration="5537000" />
       <workItem from="1631352998272" duration="7501000" />
-      <workItem from="1631453738524" duration="17429000" />
+      <workItem from="1631453738524" duration="18154000" />
     </task>
     <servers />
   </component>
