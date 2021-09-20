@@ -55,7 +55,6 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
     path('order/userDeletedDoneOrders/', ordersViews.GetDeletedDoneOrdersOfUserView.as_view()),
     path('order/client_action/<pk>', ordersViews.ApproveOrderByClient.as_view()),
     path('order/extraServices/', ordersViews.GetExtraServicesView.as_view()),
-    path('order/payment_info/<str:paymentId>', ordersViews.paymentInfo_view.as_view(), name="payment_info"),
     path('order/calculateCost/', ordersViews.calculateCost_view, name="calculate_cost"),
 
 
@@ -84,4 +83,6 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
 
     #Payment
     path('payment/pay/', paymentsView.pay_view, name="pay"),
+    path('order/payment_info/<str:paymentId>', paymentsView.paymentInfo_view.as_view(), name="payment_info"),
+
 ]

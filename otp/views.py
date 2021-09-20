@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import time
 from django_otp.oath import TOTP
 from wtd import settings
-from accounts.models import User
+from accounts.models import User, SpecialAccounts
 from rest_framework import views, permissions, status
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -40,7 +40,7 @@ class OTPAuthentication(views.APIView):
         OTP.objects.filter(expire__lt=now).delete()
         item = bytes(str(request.auth), 'utf-8')
         user = User.objects.get(id=request.user.id)
-
+        special = SpecialAccounts.objects.filter(phone_number=request.user.phone_number)
         if otpToken:
             otpInfo = OTP.objects.get(user_id=user.id)
             now = str(datetime.now())
@@ -55,25 +55,27 @@ class OTPAuthentication(views.APIView):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             OTP.objects.filter(user=user).delete()
-
-        token = TOTP(item)
-        otp = token.token()
-        # otp = 999999
-        # send_mail(
-        #     subject="Your OTP Password",
-        #     message="Your OTP password is %s" % otp,
-        #     from_email=settings.EMAIL_HOST_USER,
-        #     recipient_list=[user]
-        # )
-        try:
-            body = "your OTP number: " + str(otp)
-            result = rest_controller.create_send_message(app_sid, sender_id, body,
-                                                         '966' + user.phone_number,
-                                                         response_type, correlation_id, base_encode,
-                                                         status_callback),
-            print('RESSSSULT OF SMS', result)
-        except APIException as e:
-            print('ERRROR OF SMS', e)
+        if len(special):
+            otp = 999999
+        else:
+            token = TOTP(item)
+            otp = token.token()
+            # otp = 999999
+            # send_mail(
+            #     subject="Your OTP Password",
+            #     message="Your OTP password is %s" % otp,
+            #     from_email=settings.EMAIL_HOST_USER,
+            #     recipient_list=[user]
+            # )
+            try:
+                body = "your OTP number: " + str(otp)
+                result = rest_controller.create_send_message(app_sid, sender_id, body,
+                                                             '966' + user.phone_number,
+                                                             response_type, correlation_id, base_encode,
+                                                             status_callback),
+                print('RESSSSULT OF SMS', result)
+            except APIException as e:
+                print('ERRROR OF SMS', e)
         newOTPRow = OTP(otp=otp,
                         expire=str(datetime.now() +
                                    timedelta(minutes=5)),

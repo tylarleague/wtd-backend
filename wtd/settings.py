@@ -139,10 +139,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('database', 'postgres'),
-        'USER': os.getenv('username', 'postgres'),
-        'PASSWORD': os.getenv('password', 'postgresPass'),
-        'HOST': os.getenv('host', 'db'),
-        'PORT': os.getenv('port', '5432'),
+        'USER': os.getenv('username', 'doadmin'),
+        'PASSWORD': os.getenv('password', 'vwhQkTCyZoZ81FUg'),
+        'HOST': os.getenv('host', 'db-postgresql-fra1-45029-do-user-8981715-0.b.db.ondigitalocean.com'),
+        'PORT': os.getenv('port', '25060'),
     }
 }
 # DATABASES = {
@@ -185,6 +185,17 @@ USE_L10N = True
 
 USE_TZ = True
 
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', 'SGBGPFRADB4OLGNOKLPL')
+AWS_STORAGE_BUCKET_NAME = os.getenv(
+    'AWS_STORAGE_BUCKET_NAME', 'filestorage-pubbles')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY',
+                                  'irRJV3bQdNM6KFtTBniCpX1fU7jdaj5m3Ay1Y/tzfHY')
+AWS_S3_REGION_NAME = 'fra1'
+AWS_S3_ENDPOINT_URL = 'fra1.digitaloceanspaces.com'
+AWS_S3_FILE_OVERWRITE = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/

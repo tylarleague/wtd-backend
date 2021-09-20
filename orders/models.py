@@ -20,6 +20,8 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     approved_by_client = models.BooleanField(default=False)
     payment_authorized = models.BooleanField(default=False)
+    order_type = models.CharField(max_length=50, default="ONE_WAY")
+    waiting_time = models.IntegerField(null=True, blank=True)
     # need_nurse = models.BooleanField(default=False)
     provider = models.ForeignKey(
         ProviderProfile, related_name="provider_related_orders", on_delete=models.CASCADE, null=True, blank=True)

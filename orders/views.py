@@ -46,9 +46,15 @@ class CreateOrderView(generics.CreateAPIView):
         #     nurse_cost = 150
         # else:
         #     nurse_cost = 0
+        if(serializer.data['order_type'] == "ROUND_TRIP"):
+            print("is round trip")
+            cost = ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 150) * 1.5 + 50 * serializer.data['waiting_time']
+        else:
+            print("not round trip")
+            cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) +  150
         print('distance_in_kilo', distance_in_kilo)
         print('duration_in_minutes', duration_in_minutes)
-        cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+        # cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
         cost_after_vat = (115 * cost) / 100
         print('cost_after_vat', cost_after_vat)
         myInv = Invoice.objects.create(
@@ -234,17 +240,17 @@ class ActionOrderByOperation(generics.UpdateAPIView):
     queryset = Order.objects.all()
 
 
-class paymentInfo_view(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, paymentId):
-        if paymentId:
-            try:
-                url = "https://api.tap.company/v2/authorize/" + paymentId
-                payload = "{}"
-                headers = {'authorization': 'Bearer sk_test_g5nBLfJUcuVE9mkTKezvlxMF'}
-                response = requests.request("GET", url, data=payload, headers=headers)
-            except Exception as e:
-                print('errror', e)
-                return Response(e)
-        return Response(response.text)
+# class paymentInfo_view(views.APIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#
+#     def get(self, request, paymentId):
+#         if paymentId:
+#             try:
+#                 url = "https://api.tap.company/v2/authorize/" + paymentId
+#                 payload = "{}"
+#                 headers = {'authorization': 'Bearer sk_test_g5nBLfJUcuVE9mkTKezvlxMF'}
+#                 response = requests.request("GET", url, data=payload, headers=headers)
+#             except Exception as e:
+#                 print('errror', e)
+#                 return Response(e)
+#         return Response(response.text)

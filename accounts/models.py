@@ -148,3 +148,14 @@ def save_user_profile(sender, instance, **kwargs):
         instance.user_operation_profile.save()
     if instance.isProvider:
         instance.user_provider_profile.save()
+
+
+class SpecialAccounts(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4,
+                          editable=False)
+    phone_regex = RegexValidator(regex="^(5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$",
+                                 message="Phone number must be entered in the format: '555555555'. Up to 9 digits allowed.")
+    phone_number = models.CharField(_('special phone number'), validators=[phone_regex], max_length=9, unique=True)  # validators should be a list
+
+    def __str__(self):
+        return str(self.phone_number)

@@ -6,9 +6,40 @@ import http.client
 import json
 import requests
 from django.forms.models import model_to_dict
+from rest_framework.decorators import api_view
+from rest_framework import views, permissions, status
 from django.core import serializers
 # Create your views here.
 
+
+class paymentInfo_view(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, paymentId):
+        if paymentId:
+            try:
+                url = "https://api.tap.company/v2/charges/" + paymentId
+                payload = "{}"
+                headers = {'authorization': 'Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX'}
+                response = requests.request("GET", url, data=payload, headers=headers)
+            except Exception as e:
+                print('errror', e)
+                return Response(e)
+
+            print('response', json.loads(response.text))
+            tapData = json.loads(response.text)
+            order_id = tapData['metadata']['order_id']
+            order = Order.objects.get(id=tapData['metadata']['order_id'])
+            print('ORRRDER', order)
+            print('Ussser', request.user)
+            payment = Payment.objects.create(
+                order=order,
+                user=request.user,
+                tap_id=tapData['id'],
+                status=tapData['status']
+            )
+            print('payment', payment)
+        return Response(response.text)
 
 @api_view(['POST', ])
 def pay_view(request):
@@ -68,7 +99,7 @@ def pay_view(request):
         payload = json.dumps(requestBody)
 
         headers = {
-            'authorization': "Bearer sk_test_g5nBLfJUcuVE9mkTKezvlxMF",
+            'authorization': "Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX",
             'content-type': "application/json"
         }
         url = "https://api.tap.company/v2/charges"

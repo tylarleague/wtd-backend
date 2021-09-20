@@ -1,7 +1,9 @@
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
+import requests
 # from fcm_django.models import FCMDevice
 #
+import json
 # from accounts.models import User
 # from notifications.models import Notification
 # from notifications.serializers import NotificationListSerializer
@@ -115,6 +117,7 @@ def announce_status_change(sender, instance, created, **kwargs):
                 print('I am suppose to send sms to provider', instance.provider.user.phone_number)
                 sendSMS(instance.custom_id, instance.provider.user.phone_number, "تم إلغاؤه",
                         "has been canceled")
+            refundAmount(instance)
         elif instance.status == 'done':
             print('I am suppose to update operation')
             # channel_layer = get_channel_layer()
@@ -130,6 +133,9 @@ def announce_status_change(sender, instance, created, **kwargs):
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
             sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم الانتهاء منه",
                     "has been finished")
+
+            # Capture Money
+            # print('instance.order_related_payments', instance.order_related_payments)
         else:
             print('Unknown status at Signals')
 
@@ -144,3 +150,51 @@ def sendSMS(order_number, phone_number, arabic_text, english_text):
         print('RESSSSULT OF SMS', result)
     except APIException as e:
         print('ERRROR OF SMS', e)
+
+
+def refundAmount(order):
+    print('inside refund amount', order)
+    print('instance.order_related_payments', order.order_related_payments.all())
+    # payment_to_refund = None
+    for payment in order.order_related_payments.all():
+        if payment.status == "CAPTURED":
+            payment_to_refund = payment
+    if payment_to_refund:
+        try:
+            url = "https://api.tap.company/v2/refunds"
+
+            requestData = {
+                "charge_id": payment_to_refund.tap_id,
+                "amount": order.order_related_invoice.cost,
+                "currency": "SAR",
+                "description": "Order Canceled",
+                "reason": "requested_by_customer",
+                "metadata": {
+                    "order_id": order.id,
+                },
+                "post": {
+                    "url": ""
+                }
+            }
+
+            payload = json.dumps(requestData)
+
+            # payload = "{\"charge_id\":\"chg_86dfjghadfuda7ft\",\"amount\":2,\"currency\":\"KWD\",\"description\":\"Test Description\",\"reason\":\"requested_by_customer\",\"reference\":{\"merchant\":\"txn_0001\"},\"metadata\":{\"udf1\":\"test1\",\"udf2\":\"test2\"},\"post\":{\"url\":\"http://your_url.com/post\"}}"
+            headers = {
+                'authorization': 'Bearer sk_test_g5nBLfJUcuVE9mkTKezvlxMF',
+                'content-type': "application/json"
+            }
+
+            response = requests.request("POST", url, data=payload, headers=headers)
+            data = json.loads(response.text)
+            print('refuuuund response daaataaa', data)
+            print('payment_to_refund before update', payment_to_refund.tap_refund_id)
+            payment_to_refund.tap_refund_id = data['id']
+            payment_to_refund.status = "REFUND REQUEST"
+            payment_to_refund.save()
+            print('payment_to_refund after update', payment_to_refund.tap_refund_id)
+            # print('refuuuund response', response.text)
+        except APIException as e:
+            print('refund error', e)
+    else:
+        print('No Payment to refund')
