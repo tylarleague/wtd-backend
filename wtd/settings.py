@@ -138,7 +138,7 @@ EMAIL_HOST_PASSWORD = os.getenv('USER_EMAIL_PASSWORD', 'QAZqaz@123')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('database', 'postgres'),
+        'NAME': os.getenv('database', 'defaultdb'),
         'USER': os.getenv('username', 'doadmin'),
         'PASSWORD': os.getenv('password', 'vwhQkTCyZoZ81FUg'),
         'HOST': os.getenv('host', 'db-postgresql-fra1-45029-do-user-8981715-0.b.db.ondigitalocean.com'),

@@ -48,10 +48,10 @@ class CreateOrderView(generics.CreateAPIView):
         #     nurse_cost = 0
         if(serializer.data['order_type'] == "ROUND_TRIP"):
             print("is round trip")
-            cost = ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 150) * 1.5 + 50 * serializer.data['waiting_time']
+            cost = ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * serializer.data['waiting_time']
         else:
             print("not round trip")
-            cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) +  150
+            cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
         print('distance_in_kilo', distance_in_kilo)
         print('duration_in_minutes', duration_in_minutes)
         # cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
