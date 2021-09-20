@@ -203,7 +203,7 @@ AWS_ACCESS_KEY_ID = 'SGBGPFRADB4OLGNOKLPL'
 AWS_STORAGE_BUCKET_NAME = 'wtd-space'
 AWS_SECRET_ACCESS_KEY = 'irRJV3bQdNM6KFtTBniCpX1fU7jdaj5m3Ay1Y/tzfHY'
 AWS_S3_REGION_NAME = 'fra1'
-AWS_S3_ENDPOINT_URL = 'fra1.digitaloceanspaces.com'
+AWS_S3_ENDPOINT_URL = 'https://fra1.digitaloceanspaces.com'
 AWS_S3_FILE_OVERWRITE = False
 
 # Static files (CSS, JavaScript, Images)
