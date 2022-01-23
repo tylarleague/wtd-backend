@@ -18,7 +18,7 @@ from asgiref.sync import async_to_sync
 from unifonicnextgen.unifonicnextgen_client import UnifonicnextgenClient
 from unifonicnextgen.configuration import Configuration
 from unifonicnextgen.exceptions.api_exception import APIException
-
+from payments.models import Payment
 basic_auth_user_name = 'e637a3df-8da4-4cd2-b524-5a5409e811f9'
 basic_auth_password = '0UpBuW8KAxwOWkJn8Y7lKBbrFEz4aTFn87z3kFwwpWhFB3XJAec2Dn4BTeCakSlkdhGAfCbxkWK'
 
@@ -155,17 +155,15 @@ def sendSMS(order_number, phone_number, arabic_text, english_text):
 def refundAmount(order):
     print('inside refund amount', order)
     print('instance.order_related_payments', order.order_related_payments.all())
-    # payment_to_refund = None
-    for payment in order.order_related_payments.all():
-        if payment.status == "CAPTURED":
-            payment_to_refund = payment
-    if payment_to_refund:
+    payment_to_refund = None
+    payments = Payment.objects.get(order=order, status='CAPTURED')
+    if payments:
         try:
             url = "https://api.tap.company/v2/refunds"
 
             requestData = {
-                "charge_id": payment_to_refund.tap_id,
-                "amount": order.order_related_invoice.cost,
+                "charge_id": payments.tap_id,
+                "amount": payments.amount,
                 "currency": "SAR",
                 "description": "Order Canceled",
                 "reason": "requested_by_customer",
@@ -181,18 +179,19 @@ def refundAmount(order):
 
             # payload = "{\"charge_id\":\"chg_86dfjghadfuda7ft\",\"amount\":2,\"currency\":\"KWD\",\"description\":\"Test Description\",\"reason\":\"requested_by_customer\",\"reference\":{\"merchant\":\"txn_0001\"},\"metadata\":{\"udf1\":\"test1\",\"udf2\":\"test2\"},\"post\":{\"url\":\"http://your_url.com/post\"}}"
             headers = {
-                'authorization': 'Bearer sk_test_g5nBLfJUcuVE9mkTKezvlxMF',
+                'authorization': 'Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX',
                 'content-type': "application/json"
             }
 
             response = requests.request("POST", url, data=payload, headers=headers)
             data = json.loads(response.text)
             print('refuuuund response daaataaa', data)
-            print('payment_to_refund before update', payment_to_refund.tap_refund_id)
-            payment_to_refund.tap_refund_id = data['id']
-            payment_to_refund.status = "REFUND REQUEST"
-            payment_to_refund.save()
-            print('payment_to_refund after update', payment_to_refund.tap_refund_id)
+            print('payments before update', payments.tap_refund_id)
+            if data and data.id:
+                payments.tap_refund_id = data['id']
+                payments.status = "REFUND REQUEST"
+                payments.save()
+            print('payments after update', payments.tap_refund_id)
             # print('refuuuund response', response.text)
         except APIException as e:
             print('refund error', e)
