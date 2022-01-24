@@ -13,7 +13,7 @@ RUN apk add python3-dev openssl-dev libffi-dev gcc && pip3 install --upgrade pip
 RUN mkdir /code
 WORKDIR /code
 
-RUN virtualenv env
+RUN virtualenv -p python3.7 env
 ENV VIRTUAL_ENV env
 
 ADD requirements.txt /code/

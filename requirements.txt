@@ -97,4 +97,3 @@ virtualenv==20.6.0
 wcwidth==0.2.5
 zipp==3.4.0
 zope.interface==5.2.0
-turfpy==0.0.7
