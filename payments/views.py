@@ -9,6 +9,11 @@ from django.forms.models import model_to_dict
 from rest_framework.decorators import api_view
 from rest_framework import views, permissions, status
 from django.core import serializers
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from payments.serializers import PaymentSerializer
+from rest_framework import generics
+
 # Create your views here.
 
 
@@ -133,3 +138,9 @@ def pay_view(request):
 
         }
         return Response(ResponseData)
+
+class CreatePaymentView(generics.CreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PaymentSerializer
+    queryset = Order.objects.all()

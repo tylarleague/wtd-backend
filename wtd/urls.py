@@ -83,6 +83,7 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
 
     #Payment
     path('payment/pay/', paymentsView.pay_view, name="pay"),
+    path('payment/', paymentsView.CreatePaymentView.as_view(), name="pay"),
     path('order/payment_info/<str:paymentId>', paymentsView.paymentInfo_view.as_view(), name="payment_info"),
 
 ]

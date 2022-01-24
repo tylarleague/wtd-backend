@@ -157,6 +157,7 @@ class Invoice(models.Model):
     duration_value = models.IntegerField()
     duration_text = models.CharField(max_length=50)
     cost = models.IntegerField()
+    initial_cost = models.IntegerField()
 
 
     def __str__(self):
