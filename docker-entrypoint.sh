@@ -1,12 +1,12 @@
 #!/bin/sh
 echo "Get inside virtual environment"
-source env/bin/activate
+# source env/bin/activate
 
 echo "Install requirements"
-pip install -r requirements.txt
+# pip install -r requirements.txt
 
 echo "Install redis requirements"
-pip install turfpy
+# pip install turfpy
 
 echo "Collect static files"
 python manage.py collectstatic --noinput
