@@ -56,14 +56,21 @@ class CreateOrderView(generics.CreateAPIView):
         print('duration_in_minutes', duration_in_minutes)
         # cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
         cost_after_vat = (115 * cost) / 100
-        print('cost_after_vat', cost_after_vat)
+        final_cost = cost_after_vat
+        try:
+            if request.data['cost']:
+                final_cost= request.data['cost']
+        except:
+            print("no cost")
+        print('cost_after_vat', cost_after_vat, )
         myInv = Invoice.objects.create(
             order=order,
             distance_value=distance['rows'][0]['elements'][0]['distance']['value'],
             distance_text = distance['rows'][0]['elements'][0]['distance']['text'],
             duration_value=distance['rows'][0]['elements'][0]['duration']['value'],
             duration_text=distance['rows'][0]['elements'][0]['duration']['text'],
-            cost= cost_after_vat,
+            cost= final_cost,
+            initial_cost=cost_after_vat
         )
         report = AmbReport.objects.create(order=order)
         print('myInv', myInv)
