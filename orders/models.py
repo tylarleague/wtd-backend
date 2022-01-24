@@ -1,11 +1,72 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 # Create your models here.
-from accounts.models import ClientProfile, Person, ProviderProfile
+from accounts.models import ClientProfile, Person, ProviderProfile, OperationProfile
 from django.contrib.postgres.fields import JSONField
 from datetime import datetime, timedelta
 from django.utils import timezone
 
+
+
+class Region(models.Model):
+    name = models.CharField(max_length=2000)
+    operator = models.ForeignKey(
+        OperationProfile, related_name="operation_related_regions", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.name) + " region operated by: " + str(self.operator.user.name)
+
+
+class RegionPoint(models.Model):
+    region = models.ForeignKey(
+        Region, related_name="region_related_points", on_delete=models.CASCADE)
+    name = models.CharField(max_length=2000, null=True, blank=True)
+    lat = models.FloatField()
+    lng = models.FloatField()
+
+    def __str__(self):
+        return str(self.lat) +" , " + str(self.lng) + " related to: " + str(self.region.name)
+
+
+class City(models.Model):
+    name = models.CharField(max_length=2000)
+    region = models.ForeignKey(
+        Region, related_name="region_related_cities", on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+
+class CityPoint(models.Model):
+    city = models.ForeignKey(
+        City, related_name="city_related_points", on_delete=models.CASCADE)
+    name = models.CharField(max_length=2000, null=True, blank=True)
+    lat = models.FloatField()
+    lng = models.FloatField()
+
+    def __str__(self):
+        return str(self.lat) +" , " + str(self.lng) + " related to: " + str(self.city.name)
+
+class SpecialLocation(models.Model):
+    name = models.CharField(max_length=2000)
+    one_way_price = models.IntegerField()
+    two_way_price = models.IntegerField()
+    city = models.ForeignKey(
+        City, related_name="city_related_special_locations", on_delete=models.CASCADE, null=True, blank=True, default=None)
+
+    def __str__(self):
+        return str(self.name) + ": 1-way: " + str(self.one_way_price) + " - 2-way: " + str(self.two_way_price)
+
+
+class SpecialLocationPoint(models.Model):
+    special_location = models.ForeignKey(
+        SpecialLocation, related_name="special_location_related_points", on_delete=models.CASCADE)
+    name = models.CharField(max_length=2000, null=True, blank=True)
+    lat = models.FloatField()
+    lng = models.FloatField()
+
+    def __str__(self):
+        return str(self.lat) +" , " + str(self.lng) + " related to: " + str(self.special_location.name)
 
 class Order(models.Model):
     owner = models.ForeignKey(
@@ -30,7 +91,21 @@ class Order(models.Model):
     health_institution = models.BooleanField(default=False)
     appointment_approval = models.FileField(
         upload_to='appointment_approvals', null=True, blank=True)
+    from_region = models.ForeignKey(
+        Region, related_name="from_region_related_orders", on_delete=models.CASCADE, null=True, blank=True)
+    to_region = models.ForeignKey(
+        Region, related_name="to_region_related_orders", on_delete=models.CASCADE, null=True, blank=True)
+    from_city = models.ForeignKey(
+        City, related_name="from_city_related_orders", on_delete=models.CASCADE, null=True, blank=True)
+    to_city = models.ForeignKey(
+        City, related_name="to_city_related_orders", on_delete=models.CASCADE, null=True, blank=True)
+    from_special_location = models.ForeignKey(
+        SpecialLocation, related_name="from_special_location_related_orders", on_delete=models.CASCADE, null=True, blank=True)
+    to_special_location = models.ForeignKey(
+        SpecialLocation, related_name="to_special_location_related_orders", on_delete=models.CASCADE, null=True, blank=True)
     history = HistoricalRecords()
+
+    # models.ForeignKey(subjects, blank=True, null=True)
     # special_id = models.CharField(max_length=255, null=True, default=None)
 
     # def save(self, *args, **kwargs):
@@ -82,7 +157,7 @@ class Invoice(models.Model):
     duration_value = models.IntegerField()
     duration_text = models.CharField(max_length=50)
     cost = models.IntegerField()
-    initial_cost = models.IntegerField()
+    initial_cost = models.IntegerField(default=0)
 
 
     def __str__(self):

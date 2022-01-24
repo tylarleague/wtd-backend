@@ -11,7 +11,7 @@ class Payment(models.Model):
     tap_id = models.CharField(max_length=500)
     tap_refund_id = models.CharField(max_length=500, null=True, blank=True)
     status = models.CharField(max_length=500, null=True, blank=True)
-    amount = models.IntegerField()
+    amount = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.status) + " related to order: " + str(self.order.id) + " for user " + str(self.user.phone_number)

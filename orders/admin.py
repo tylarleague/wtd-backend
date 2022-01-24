@@ -1,12 +1,18 @@
 from django.contrib import admin
 
 # Register your models here.
-from orders.models import Order, Invoice, ExtraServices, AmbReport
+from orders.models import Order, Invoice, ExtraServices, AmbReport, Region, RegionPoint, CityPoint, City, SpecialLocationPoint, SpecialLocation
 
 # admin.site.register(Order)
 admin.site.register(Invoice)
 admin.site.register(ExtraServices)
 admin.site.register(AmbReport)
+admin.site.register(Region)
+admin.site.register(RegionPoint)
+admin.site.register(City)
+admin.site.register(CityPoint)
+admin.site.register(SpecialLocation)
+admin.site.register(SpecialLocationPoint)
 
 
 
