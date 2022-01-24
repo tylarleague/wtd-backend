@@ -22,6 +22,7 @@ ADD . /code/
 
 RUN mkdir -p /code/static
 RUN source env/bin/activate
+RUN pip install sciPy
 RUN pip install -r requirements.txt
 RUN pip install django-redis
 #c
