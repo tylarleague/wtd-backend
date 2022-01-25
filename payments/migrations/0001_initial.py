@@ -24,6 +24,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(blank=True, max_length=500, null=True)),
                 ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='order_related_payments', to='orders.order')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user_related_payments', to=settings.AUTH_USER_MODEL)),
+                ('amount', models.IntegerField(default=0)),
             ],
         ),
     ]

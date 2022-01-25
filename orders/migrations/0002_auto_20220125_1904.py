@@ -20,14 +20,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='ExtraServices',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('service_name', models.CharField(max_length=100)),
-                ('service_cost', models.IntegerField()),
-            ],
-        ),
-        migrations.CreateModel(
             name='Region',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -44,96 +36,6 @@ class Migration(migrations.Migration):
                 ('two_way_price', models.IntegerField()),
                 ('city', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='city_related_special_locations', to='orders.city')),
             ],
-        ),
-        migrations.AddField(
-            model_name='historicalorder',
-            name='appointment_approval',
-            field=models.TextField(blank=True, max_length=100, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorder',
-            name='approved_by_client',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='historicalorder',
-            name='approved_by_provider',
-            field=models.BooleanField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorder',
-            name='health_institution',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='historicalorder',
-            name='notes',
-            field=models.CharField(blank=True, max_length=500, null=True),
-        ),
-        migrations.AddField(
-            model_name='historicalorder',
-            name='order_type',
-            field=models.CharField(default='ONE_WAY', max_length=50),
-        ),
-        migrations.AddField(
-            model_name='historicalorder',
-            name='payment_authorized',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='historicalorder',
-            name='provider',
-            field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='accounts.providerprofile'),
-        ),
-        migrations.AddField(
-            model_name='historicalorder',
-            name='waiting_time',
-            field=models.IntegerField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='order',
-            name='appointment_approval',
-            field=models.FileField(blank=True, null=True, upload_to='appointment_approvals'),
-        ),
-        migrations.AddField(
-            model_name='order',
-            name='approved_by_client',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='order',
-            name='approved_by_provider',
-            field=models.BooleanField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='order',
-            name='health_institution',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='order',
-            name='notes',
-            field=models.CharField(blank=True, max_length=500, null=True),
-        ),
-        migrations.AddField(
-            model_name='order',
-            name='order_type',
-            field=models.CharField(default='ONE_WAY', max_length=50),
-        ),
-        migrations.AddField(
-            model_name='order',
-            name='payment_authorized',
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name='order',
-            name='provider',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='provider_related_orders', to='accounts.providerprofile'),
-        ),
-        migrations.AddField(
-            model_name='order',
-            name='waiting_time',
-            field=models.IntegerField(blank=True, null=True),
         ),
         migrations.CreateModel(
             name='SpecialLocationPoint',
@@ -156,18 +58,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Invoice',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('distance_value', models.IntegerField()),
-                ('distance_text', models.CharField(max_length=50)),
-                ('duration_value', models.IntegerField()),
-                ('duration_text', models.CharField(max_length=50)),
-                ('cost', models.IntegerField()),
-                ('order', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='order_related_invoice', to='orders.order')),
-            ],
-        ),
-        migrations.CreateModel(
             name='CityPoint',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -181,19 +71,6 @@ class Migration(migrations.Migration):
             model_name='city',
             name='region',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='region_related_cities', to='orders.region'),
-        ),
-        migrations.CreateModel(
-            name='AmbReport',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('history', models.CharField(blank=True, max_length=2000, null=True)),
-                ('temp', models.CharField(blank=True, max_length=100, null=True)),
-                ('oxygen', models.CharField(blank=True, max_length=100, null=True)),
-                ('BP', models.CharField(blank=True, max_length=100, null=True)),
-                ('pulse', models.CharField(blank=True, max_length=100, null=True)),
-                ('infectious_diseases', models.BooleanField(default=False)),
-                ('order', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='order_related_report', to='orders.order')),
-            ],
         ),
         migrations.AddField(
             model_name='historicalorder',
