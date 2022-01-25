@@ -136,16 +136,16 @@ EMAIL_HOST_PASSWORD = os.getenv('USER_EMAIL_PASSWORD', 'QAZqaz@123')
 
 #
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'defaultdb',
-#         'USER': 'doadmin',
-#         'PASSWORD': 'vwhQkTCyZoZ81FUg',
-#         'HOST': 'db-postgresql-fra1-45029-do-user-8981715-0.b.db.ondigitalocean.com',
-#         'PORT': '25060',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'defaultdb',
+        'USER': 'doadmin',
+        'PASSWORD': 'vwhQkTCyZoZ81FUg',
+        'HOST': 'db-postgresql-fra1-45029-do-user-8981715-0.b.db.ondigitalocean.com',
+        'PORT': '25060',
+    }
+}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
@@ -156,12 +156,12 @@ EMAIL_HOST_PASSWORD = os.getenv('USER_EMAIL_PASSWORD', 'QAZqaz@123')
 #         'PORT': os.getenv('port', '25060'),
 #     }
 # }
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 
 
 # Password validation
