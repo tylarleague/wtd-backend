@@ -20,7 +20,7 @@ from geojson import Point, Feature, FeatureCollection
 from turfpy.measurement import centroid
 from geojson import Point, MultiPolygon, Feature, Polygon, FeatureCollection
 from django.core import serializers
-# from turfpy.measurement import area
+from turfpy.measurement import area
 class OrderViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
