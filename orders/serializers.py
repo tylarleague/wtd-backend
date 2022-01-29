@@ -57,6 +57,8 @@ class CreateOrderSerializer(serializers.ModelSerializer):
     custom_id = serializers.ReadOnlyField()
     appointment_approval = Base64ImageField(
         max_length=None, use_url=True, required=False)
+    discharge_approval = Base64ImageField(
+        max_length=None, use_url=True, required=False)
     class Meta:
         model = Order
         fields = "__all__"
