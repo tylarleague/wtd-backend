@@ -53,11 +53,15 @@ def announce_status_change(sender, instance, created, **kwargs):
             #     "update_order", {"type": "change.update_order",
             #                      "event": "Open",
             #                      "object": instance.id})
-            for operation_profile in operation_profiles:
-                if operation_profile.is_available is True:
-                    print('operation_profile', operation_profile.user.phone_number)
-                    sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم انشاؤه",
-                            "has been created")
+            if instance.operator:
+                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم انشاؤه",
+                        "has been created")
+            else:
+                for operation_profile in operation_profiles:
+                    if operation_profile.is_available is True:
+                        print('operation_profile', operation_profile.user.phone_number)
+                        sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم انشاؤه",
+                                "has been created")
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
             sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم استلامه و في انتظار الموافقة", "has been created, waiting for approval")
         elif instance.status == 'sent_to_provider':
@@ -70,11 +74,15 @@ def announce_status_change(sender, instance, created, **kwargs):
             #     "update_order", {"type": "change.update_order",
             #                      "event": "Rejected By Provider",
             #                      "object": instance.id})
-            for operation_profile in operation_profiles:
-                if operation_profile.is_available is True:
-                    print('operation_profile', operation_profile.user.phone_number)
-                    sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم رفضه من مقدم الخدمة",
-                            "has been rejected by provider")
+            if instance.operator:
+                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم انشاؤه",
+                        "has been created")
+            else:
+                for operation_profile in operation_profiles:
+                    if operation_profile.is_available is True:
+                        print('operation_profile', operation_profile.user.phone_number)
+                        sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم رفضه من مقدم الخدمة",
+                                "has been rejected by provider")
         # elif instance.status == 'approved_by_provider':
         #     print('I am suppose to update operation')
         #     # channel_layer = get_channel_layer()
@@ -100,11 +108,15 @@ def announce_status_change(sender, instance, created, **kwargs):
             #     "update_order", {"type": "change.update_order",
             #                      "event": "Started By Provider",
             #                      "object": instance.id})
-            for operation_profile in operation_profiles:
-                if operation_profile.is_available is True:
-                    print('operation_profile', operation_profile.user.phone_number)
-                    sendSMS(instance.custom_id, operation_profile.user.phone_number, "بدأ من قبل مقدم الخدمة",
-                            "has been started by provider")
+            if instance.operator:
+                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم انشاؤه",
+                        "has been created")
+            else:
+                for operation_profile in operation_profiles:
+                    if operation_profile.is_available is True:
+                        print('operation_profile', operation_profile.user.phone_number)
+                        sendSMS(instance.custom_id, operation_profile.user.phone_number, "بدأ من قبل مقدم الخدمة",
+                                "has been started by provider")
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
             sendSMS(instance.custom_id, instance.owner.user.phone_number, "، سيارة الاسعاف في طريقها إليك",
                     "has been started, an ambulance is on its way to you")
@@ -125,11 +137,15 @@ def announce_status_change(sender, instance, created, **kwargs):
             #     "update_order", {"type": "change.update_order",
             #                      "event": "Delivered",
             #                      "object": instance.id})
-            for operation_profile in operation_profiles:
-                if operation_profile.is_available is True:
-                    print('operation_profile', operation_profile.user.phone_number)
-                    sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم الانتهاء منه",
-                            "has been finished")
+            if instance.operator:
+                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم انشاؤه",
+                        "has been created")
+            else:
+                for operation_profile in operation_profiles:
+                    if operation_profile.is_available is True:
+                        print('operation_profile', operation_profile.user.phone_number)
+                        sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم الانتهاء منه",
+                                "has been finished")
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
             sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم الانتهاء منه",
                     "has been finished")

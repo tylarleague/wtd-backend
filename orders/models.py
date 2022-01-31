@@ -51,6 +51,7 @@ class SpecialLocation(models.Model):
     name = models.CharField(max_length=2000)
     one_way_price = models.IntegerField()
     two_way_price = models.IntegerField()
+    special_price = models.IntegerField(default=0)
     city = models.ForeignKey(
         City, related_name="city_related_special_locations", on_delete=models.CASCADE, null=True, blank=True, default=None)
 
@@ -86,6 +87,8 @@ class Order(models.Model):
     # need_nurse = models.BooleanField(default=False)
     provider = models.ForeignKey(
         ProviderProfile, related_name="provider_related_orders", on_delete=models.CASCADE, null=True, blank=True)
+    operator = models.ForeignKey(
+        OperationProfile, related_name="operator_related_orders", on_delete=models.CASCADE, null=True, blank=True)
     approved_by_provider = models.BooleanField(null=True, blank=True)
     notes = models.CharField(max_length=500, null=True, blank=True)
     health_institution = models.BooleanField(default=False)
