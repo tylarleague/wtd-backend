@@ -279,7 +279,7 @@ class GetOrdersOperation(generics.ListAPIView):
         # thoughts_user_can_view = user.user_can_view.values().values_list('id', flat=True)
         # friends_list = Friend.objects.friends(user)
         not_wanted_status = ['done', 'canceled']
-        return Order.objects.filter(approved_by_client=True, payment_authorized=True).exclude(status__in=not_wanted_status).order_by('order_date', 'arrival_time')
+        return Order.objects.filter(approved_by_client=True).exclude(status__in=not_wanted_status).order_by('order_date', 'arrival_time')
 
 
 class GetDeletedDoneOrdersOperation(generics.ListAPIView):
