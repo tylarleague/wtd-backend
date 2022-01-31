@@ -14,8 +14,11 @@ from orders.serializers import OrderSerializer, CreateOrderSerializer, GetOrders
 from rest_framework.response import Response
 import requests
 import json
-from turfpy.measurement import boolean_point_in_polygon, area
-from geojson import Point, MultiPolygon, Feature, Polygon
+from turfpy.measurement import boolean_point_in_polygon, area, nearest_point
+from turfpy.measurement import nearest_point
+from geojson import Point, Feature, FeatureCollection
+from turfpy.measurement import centroid
+from geojson import Point, MultiPolygon, Feature, Polygon, FeatureCollection
 from django.core import serializers
 from turfpy.measurement import area
 class OrderViewSet(viewsets.ModelViewSet):
@@ -59,6 +62,7 @@ class CreateOrderView(generics.CreateAPIView):
         print('choosen to_point', to_point)
         print('==============Update Region==============')
         allRegions = Region.objects.all()
+        allRegionsPolygons = []
         print('allRegions', allRegions)
         for region in allRegions:
             region_polygon_points = []
@@ -69,6 +73,7 @@ class CreateOrderView(generics.CreateAPIView):
                 region_polygon_points.append((region_point.lat, region_point.lng))
             print('polygon_points After', region_polygon_points)
             region_polygon = Polygon([region_polygon_points])
+            allRegionsPolygons.append((region, region_polygon))
             if boolean_point_in_polygon(from_point, region_polygon):
                 print("order['from_region'] 111", order.from_region)
                 order.from_region = region
@@ -129,8 +134,42 @@ class CreateOrderView(generics.CreateAPIView):
         print('order after updating regions:', order)
         serialized_obj = serializers.serialize('json', [order, ])
         print('serialized_obj', serialized_obj)
-
-
+        print('==============Assign Operator================')
+        operator_region_temp = None
+        # if there is a region, assign region operator. if there is no region, get operator of the closest region
+        if order.from_region:
+            print('inside order.from_region')
+            order.operator = order.from_region.operator
+            operator_region_temp = order.from_region
+            order.save()
+        else:
+            print('get mid point of each region, then get the nearest to from location, the operator of that region will be the one for this')
+            allRegionsCentroids = []
+            allRegionsCentroidsWithRegions = []
+            for poly_region in allRegionsPolygons:
+                print('poly_region', poly_region)
+                print('centroid(poly_region)', centroid(poly_region[1]))
+                allRegionsCentroids.append(centroid(poly_region[1]))
+                allRegionsCentroidsWithRegions.append((poly_region[0], centroid(poly_region[1])))
+                # f1 = Feature(geometry=Point([28.96991729736328, 41.01190001748873]))
+                # f2 = Feature(geometry=Point([28.948459, 41.024204]))
+                # f3 = Feature(geometry=Point([28.938674, 41.013324]))
+                # fc = FeatureCollection([f1, f2, f3])
+                # t = Feature(geometry=Point([28.973865, 41.011122]))
+                # print(json.dumps(nearest_point(t, fc), indent=2, sort_keys=True))
+                # allRegionsCentroids.append([centroid(poly_region), ])
+            fc = FeatureCollection(allRegionsCentroids)
+            print('nearest_point(from_point, fc)', nearest_point(from_point, fc))
+            print('allRegionsCentroidsWithRegions', allRegionsCentroidsWithRegions)
+            for cent_with_region in allRegionsCentroidsWithRegions:
+                print('$$$FIRST$$$', cent_with_region[1].geometry.coordinates)
+                print('$$$SECOND$$$', nearest_point(from_point, fc).geometry.coordinates)
+                if cent_with_region[1].geometry.coordinates == nearest_point(from_point, fc).geometry.coordinates:
+                    print('they are equaaaaaal', cent_with_region[0].operator)
+                    order.operator = cent_with_region[0].operator
+                    order.save()
+                    operator_region_temp = cent_with_region[0]
+            print('operator is:', order.operator, 'FROM', operator_region_temp)
         print('==============Flat Cost Calculation================')
         if order.to_special_location and order.from_special_location and order.to_special_location.city == order.from_special_location.city:
             print('2 special locations', order.to_special_location, order.from_special_location)
@@ -148,6 +187,15 @@ class CreateOrderView(generics.CreateAPIView):
             else:
                 print("not round trip")
                 cost = order.to_special_location.one_way_price
+        elif order.to_special_location:
+            print('1 special locations to_special_location', order.to_special_location)
+            if (serializer.data['order_type'] == "ROUND_TRIP"):
+                print("is round trip")
+                cost = order.to_special_location.special_price + ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * serializer.data[
+                    'waiting_time']
+            else:
+                print("not round trip")
+                cost = order.to_special_location.special_price + (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
         elif order.from_special_location and order.to_city == order.from_special_location.city:
             print('1 special locations from_special_location', order.from_special_location)
             if (serializer.data['order_type'] == "ROUND_TRIP"):
@@ -156,6 +204,15 @@ class CreateOrderView(generics.CreateAPIView):
             else:
                 print("not round trip")
                 cost = order.from_special_location.one_way_price
+        elif order.from_special_location:
+            print('1 special locations to_special_location', order.from_special_location)
+            if (serializer.data['order_type'] == "ROUND_TRIP"):
+                print("is round trip")
+                cost = order.from_special_location.special_price + ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * serializer.data[
+                    'waiting_time']
+            else:
+                print("not round trip")
+                cost = order.from_special_location.special_price + (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
         else:
             is_flat_rate = False
             print('No Special Locations')
@@ -206,6 +263,8 @@ class CreateOrderView(generics.CreateAPIView):
 def calculateCost_view(request):
 
     if request.method == 'POST':
+        from_location = eval(request.data['from_location'])
+        to_location = eval(request.data['to_location'])
         # print('from_location', request.data['from_location'])
         # print('register request.data', request.data['from_location'])
         # print('request.data', request.data)
@@ -222,6 +281,8 @@ def calculateCost_view(request):
         print('duration_in_minutes', duration_in_minutes)
         cost_after_vat = (115 * cost) / 100
         print('cost_after_vat', cost_after_vat)
+
+
         data = {
             "distance": distance_in_kilo,
             "duration": duration_in_minutes,
