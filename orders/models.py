@@ -109,6 +109,7 @@ class Order(models.Model):
     to_special_location = models.ForeignKey(
         SpecialLocation, related_name="to_special_location_related_orders", on_delete=models.CASCADE, null=True, blank=True)
     is_overweight = models.BooleanField(null=True, blank=True)
+    is_emergency= models.BooleanField(null=True, blank=True)
     is_contagious = models.BooleanField(null=True, blank=True)
     needs_oxygen = models.BooleanField(null=True, blank=True)
     is_discharged = models.BooleanField(null=True, blank=True)
