@@ -64,7 +64,7 @@ def announce_status_change(sender, instance, created, **kwargs):
                                 "has been created")
             print('I am suppose to send sms to client', instance.owner.user.phone_number)
             sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم استلامه و في انتظار الموافقة", "has been created, waiting for approval")
-        elif instance.status == 'sent_to_provider':
+        elif instance.status == 'sent_to_provider' and instance.payment_authorized:
             print('I am suppose to send sms to provider', instance.provider.user.phone_number)
             sendSMS(instance.custom_id, instance.provider.user.phone_number, " تم ارساله إليك من قبل وتد، رجاء تحديث الصفحة و من ثم القبول أو الرفض", "has been sent to you by Wtd, please refresh your page, then approve or decline")
         elif instance.status == 'rejected_by_provider':

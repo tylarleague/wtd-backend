@@ -223,13 +223,6 @@ class CreateOrderView(generics.CreateAPIView):
             else:
                 print("not round trip")
                 cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
-
-
-
-
-
-
-
         print('==========================================')
         if is_flat_rate:
             cost_after_vat = cost
@@ -258,9 +251,199 @@ class CreateOrderView(generics.CreateAPIView):
         return Response(response_serializer.data)
 
 
-
 @api_view(['POST', ])
 def calculateCost_view(request):
+    if request.method == 'POST':
+        print('request', request.data)
+        from_location = eval(request.data['from_location'])
+        to_location = eval(request.data['to_location'])
+        final_from_region = None;
+        final_to_region = None;
+        final_from_city = None;
+        final_to_city = None;
+        final_from_special = None;
+        final_to_special = None;
+        is_flat_rate = True
+
+        gmaps = googlemaps.Client(key='AIzaSyDVWqaOxUtds5e2z9OBWf79q5IASU7uBIs')
+        distance = gmaps.distance_matrix((from_location['lat'],from_location['lng']), (to_location['lat'],to_location['lng']), mode='driving')
+        print('distance', type(distance))
+        distance_in_kilo = round(distance['rows'][0]['elements'][0]['distance']['value'] / 1000, 1);
+        duration_in_minutes = round(distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0);
+        print('distance_in_kilo', distance_in_kilo)
+        print('duration_in_minutes', duration_in_minutes)
+        cost = 0
+
+        from_point = Point([from_location['lat'], from_location['lng']])
+        to_point = Point([to_location['lat'], to_location['lng']])
+        print('choosen from_point', from_point)
+        print('choosen to_point', to_point)
+        print('==============Update Region==============')
+        allRegions = Region.objects.all()
+        allRegionsPolygons = []
+        print('allRegions', allRegions)
+        for region in allRegions:
+            region_polygon_points = []
+            region_related_points = RegionPoint.objects.filter(region=region)
+            print('region_related_points', region_related_points)
+            for region_point in region_related_points:
+                print('point', region_point.lat, region_point.lng)
+                region_polygon_points.append((region_point.lat, region_point.lng))
+            print('polygon_points After', region_polygon_points)
+            region_polygon = Polygon([region_polygon_points])
+            allRegionsPolygons.append((region, region_polygon))
+            if boolean_point_in_polygon(from_point, region_polygon):
+                print("order['from_region'] 111", final_from_region)
+                final_from_region = region
+                # order.save()
+                print("order['from_region'] 222", final_from_region)
+            if boolean_point_in_polygon(to_point, region_polygon):
+                print("order['from_region'] 111", final_to_region)
+                final_to_region = region
+                # order.save()
+                print("order['from_region'] 222", final_to_region)
+        print('order after updating regions:', final_from_region, final_to_region)
+
+
+        print('==============Update City==============')
+        allCities = City.objects.all()
+        print('allCities', allCities)
+        for city in allCities:
+            city_polygon_points = []
+            city_related_points = CityPoint.objects.filter(city=city)
+            print('city_related_points', city_related_points)
+            for city_point in city_related_points:
+                print('point', city_point.lat, city_point.lng)
+                city_polygon_points.append((city_point.lat, city_point.lng))
+            print('polygon_points After', city_polygon_points)
+            city_polygon = Polygon([city_polygon_points])
+            if boolean_point_in_polygon(from_point, city_polygon):
+                print("order['from_city'] 111", final_from_city)
+                final_from_city = city
+                # order.save()
+                print("order['from_city'] 222", final_from_city)
+            if boolean_point_in_polygon(to_point, city_polygon):
+                print("order['to_city'] 111", final_to_city)
+                final_to_city = city
+                # order.save()
+                print("order['to_city'] 222",  final_to_city)
+        print('==============Update Special Location==============')
+        allSpecialLocations = SpecialLocation.objects.all()
+        print('allSpecialLocations', allSpecialLocations)
+        for special_location in allSpecialLocations:
+            special_location_polygon_points = []
+            special_location_related_points = SpecialLocationPoint.objects.filter(special_location=special_location)
+            print('special_location_related_points', special_location_related_points)
+            for special_location_point in special_location_related_points:
+                print('point', special_location_point.lat, special_location_point.lng)
+                special_location_polygon_points.append((special_location_point.lat, special_location_point.lng))
+            print('polygon_points After', special_location_polygon_points)
+            special_location_polygon = Polygon([special_location_polygon_points])
+            if boolean_point_in_polygon(from_point, special_location_polygon):
+                print("order['from_special_location'] 111",  final_from_special)
+                final_from_special = special_location
+                # order.save()
+                print("order['from_special_location'] 222", final_from_special)
+            if boolean_point_in_polygon(to_point, special_location_polygon):
+                print("order['to_special_location'] 111", final_to_special)
+                final_to_special = special_location
+                # order.save()
+                print("order['to_special_location'] 222", final_to_special)
+        print('order after updating regions:', final_from_special, final_to_special)
+        # serialized_obj = serializers.serialize('json', [order, ])
+        # print('serialized_obj', serialized_obj)
+
+        print('==============Flat Cost Calculation================')
+        if final_to_special and final_from_special and final_to_special.city == final_from_special.city:
+            print('2 special locations', final_to_special, final_to_special)
+            if (request.data['order_type'] == "ROUND_TRIP"):
+                print("is round trip")
+                cost = max(final_to_special.two_way_price, final_from_special.two_way_price)
+            else:
+                print("not round trip")
+                cost = max(final_to_special.one_way_price, final_from_special.one_way_price)
+        elif final_to_special and final_from_city == final_to_special.city:
+            print('1 special locations to_special_location', final_to_special)
+            if (request.data['order_type'] == "ROUND_TRIP"):
+                print("is round trip")
+                cost = final_to_special.two_way_price
+            else:
+                print("not round trip")
+                cost = final_to_special.one_way_price
+        elif final_to_special:
+            print('1 special locations to_special_location', final_to_special)
+            if (request.data['order_type'] == "ROUND_TRIP"):
+                print("is round trip")
+                cost = final_to_special.special_price + ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * int(request.data[
+                    'waiting_time'])
+            else:
+                print("not round trip")
+                cost = final_to_special.special_price + (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+        elif final_from_special and final_to_city == final_from_special.city:
+            print('1 special locations from_special_location', final_from_special)
+            if (request.data['order_type'] == "ROUND_TRIP"):
+                print("is round trip")
+                cost = final_from_special.two_way_price
+            else:
+                print("not round trip")
+                cost = final_from_special.one_way_price
+        elif final_from_special:
+            print('1 special locations to_special_location', final_from_special)
+            if (request.data['order_type'] == "ROUND_TRIP"):
+                print("is round trip")
+                cost = final_from_special.special_price + ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * int(request.data[
+                    'waiting_time'])
+            else:
+                print("not round trip")
+                cost = final_from_special.special_price + (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+        else:
+            is_flat_rate = False
+            print('No Special Locations')
+            if (request.data['order_type'] == "ROUND_TRIP"):
+                print("is round trip")
+                cost = ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * int(request.data[
+                    'waiting_time'])
+            else:
+                print("not round trip")
+                cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+        print('==========================================')
+        if is_flat_rate:
+            cost_after_vat = cost
+        else:
+            cost_after_vat = (115 * cost) / 100
+            print('cost_after_vat', cost_after_vat)
+        final_cost = cost_after_vat
+        try:
+            if request.data['cost']:
+                final_cost= request.data['cost']
+        except:
+            print("no cost")
+        # myInv = Invoice.objects.create(
+        #     order=order,
+        #     distance_value=distance['rows'][0]['elements'][0]['distance']['value'],
+        #     distance_text = distance['rows'][0]['elements'][0]['distance']['text'],
+        #     duration_value=distance['rows'][0]['elements'][0]['duration']['value'],
+        #     duration_text=distance['rows'][0]['elements'][0]['duration']['text'],
+        #     cost= final_cost,
+        #     initial_cost=cost_after_vat
+        # )
+        # report = AmbReport.objects.create(order=order)
+        # print('myInv', myInv)
+        # print('report', report)
+        # response_serializer = GetOrdersSerializer(order)
+        # return Response(response_serializer.data)
+        data = {
+            "distance": distance_in_kilo,
+            "duration": duration_in_minutes,
+            "total": final_cost
+
+        }
+        return Response(data)
+
+
+
+@api_view(['POST', ])
+def calculateCost_viewold(request):
 
     if request.method == 'POST':
         from_location = eval(request.data['from_location'])
@@ -340,7 +523,7 @@ class GetOrdersOperation(generics.ListAPIView):
         # thoughts_user_can_view = user.user_can_view.values().values_list('id', flat=True)
         # friends_list = Friend.objects.friends(user)
         not_wanted_status = ['done', 'canceled']
-        return Order.objects.filter(approved_by_client=True, payment_authorized=True).exclude(status__in=not_wanted_status).order_by('order_date', 'arrival_time')
+        return Order.objects.filter(approved_by_client=True).exclude(status__in=not_wanted_status).order_by('order_date', 'arrival_time')
 
 
 class GetDeletedDoneOrdersOperation(generics.ListAPIView):
