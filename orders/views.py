@@ -20,7 +20,7 @@ from geojson import Point, Feature, FeatureCollection
 from turfpy.measurement import centroid
 from geojson import Point, MultiPolygon, Feature, Polygon, FeatureCollection
 from django.core import serializers
-# from turfpy.measurement import area
+from turfpy.measurement import area
 class OrderViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -72,18 +72,19 @@ class CreateOrderView(generics.CreateAPIView):
                 print('point', region_point.lat, region_point.lng)
                 region_polygon_points.append((region_point.lat, region_point.lng))
             print('polygon_points After', region_polygon_points)
-            region_polygon = Polygon([region_polygon_points])
-            allRegionsPolygons.append((region, region_polygon))
-            if boolean_point_in_polygon(from_point, region_polygon):
-                print("order['from_region'] 111", order.from_region)
-                order.from_region = region
-                order.save()
-                print("order['from_region'] 222", order.from_region)
-            if boolean_point_in_polygon(to_point, region_polygon):
-                print("order['from_region'] 111", order.to_region)
-                order.to_region = region
-                order.save()
-                print("order['from_region'] 222", order.to_region)
+            if(len(region_polygon_points)):
+                region_polygon = Polygon([region_polygon_points])
+                allRegionsPolygons.append((region, region_polygon))
+                if boolean_point_in_polygon(from_point, region_polygon):
+                    print("order['from_region'] 111", order.from_region)
+                    order.from_region = region
+                    order.save()
+                    print("order['from_region'] 222", order.from_region)
+                if boolean_point_in_polygon(to_point, region_polygon):
+                    print("order['from_region'] 111", order.to_region)
+                    order.to_region = region
+                    order.save()
+                    print("order['from_region'] 222", order.to_region)
         print('order after updating regions:', order)
 
 
@@ -98,17 +99,18 @@ class CreateOrderView(generics.CreateAPIView):
                 print('point', city_point.lat, city_point.lng)
                 city_polygon_points.append((city_point.lat, city_point.lng))
             print('polygon_points After', city_polygon_points)
-            city_polygon = Polygon([city_polygon_points])
-            if boolean_point_in_polygon(from_point, city_polygon):
-                print("order['from_city'] 111", order.from_city)
-                order.from_city = city
-                order.save()
-                print("order['from_city'] 222", order.from_city)
-            if boolean_point_in_polygon(to_point, city_polygon):
-                print("order['to_city'] 111", order.to_city)
-                order.to_city = city
-                order.save()
-                print("order['to_city'] 222", order.to_city)
+            if(len(city_polygon_points)):
+                city_polygon = Polygon([city_polygon_points])
+                if boolean_point_in_polygon(from_point, city_polygon):
+                    print("order['from_city'] 111", order.from_city)
+                    order.from_city = city
+                    order.save()
+                    print("order['from_city'] 222", order.from_city)
+                if boolean_point_in_polygon(to_point, city_polygon):
+                    print("order['to_city'] 111", order.to_city)
+                    order.to_city = city
+                    order.save()
+                    print("order['to_city'] 222", order.to_city)
         print('==============Update Special Location==============')
         allSpecialLocations = SpecialLocation.objects.all()
         print('allSpecialLocations', allSpecialLocations)
@@ -120,17 +122,18 @@ class CreateOrderView(generics.CreateAPIView):
                 print('point', special_location_point.lat, special_location_point.lng)
                 special_location_polygon_points.append((special_location_point.lat, special_location_point.lng))
             print('polygon_points After', special_location_polygon_points)
-            special_location_polygon = Polygon([special_location_polygon_points])
-            if boolean_point_in_polygon(from_point, special_location_polygon):
-                print("order['from_special_location'] 111", order.from_special_location)
-                order.from_special_location = special_location
-                order.save()
-                print("order['from_special_location'] 222", order.from_special_location)
-            if boolean_point_in_polygon(to_point, special_location_polygon):
-                print("order['to_special_location'] 111", order.to_special_location)
-                order.to_special_location = special_location
-                order.save()
-                print("order['to_special_location'] 222", order.to_special_location)
+            if(len(special_location_polygon_points)):
+                special_location_polygon = Polygon([special_location_polygon_points])
+                if boolean_point_in_polygon(from_point, special_location_polygon):
+                    print("order['from_special_location'] 111", order.from_special_location)
+                    order.from_special_location = special_location
+                    order.save()
+                    print("order['from_special_location'] 222", order.from_special_location)
+                if boolean_point_in_polygon(to_point, special_location_polygon):
+                    print("order['to_special_location'] 111", order.to_special_location)
+                    order.to_special_location = special_location
+                    order.save()
+                    print("order['to_special_location'] 222", order.to_special_location)
         print('order after updating regions:', order)
         serialized_obj = serializers.serialize('json', [order, ])
         print('serialized_obj', serialized_obj)

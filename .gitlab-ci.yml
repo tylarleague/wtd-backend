@@ -10,7 +10,7 @@ deploy:
     - tar -czf backend.tgz wtd-backend
     - cd wtd-backend/
     - bash deploy.sh $PASSWORD
-
+    - bash deploy-client.sh $PASSWORD
 #deploy-master:
 #  stage: deploy
 #  only:

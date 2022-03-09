@@ -18,5 +18,6 @@ admin.site.register(SpecialLocationPoint)
 
 @admin.register(Order)
 class InvoiceAdmin(admin.ModelAdmin):
-    # list_display = ['owner', 'custom_id',]
+    list_display = ['owner', 'custom_id','patient','order_date','arrival_time','status']
     readonly_fields = ('custom_id',)
+    search_fields = ('id','owner__user__phone_number','status')

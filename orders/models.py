@@ -94,6 +94,8 @@ class Order(models.Model):
     health_institution = models.BooleanField(default=False)
     appointment_approval = models.FileField(
         upload_to='appointment_approvals', null=True, blank=True)
+    discharge_approval = models.FileField(
+        upload_to='discharge_approvals', null=True, blank=True)
     from_region = models.ForeignKey(
         Region, related_name="from_region_related_orders", on_delete=models.CASCADE, null=True, blank=True)
     to_region = models.ForeignKey(
@@ -106,6 +108,11 @@ class Order(models.Model):
         SpecialLocation, related_name="from_special_location_related_orders", on_delete=models.CASCADE, null=True, blank=True)
     to_special_location = models.ForeignKey(
         SpecialLocation, related_name="to_special_location_related_orders", on_delete=models.CASCADE, null=True, blank=True)
+    is_overweight = models.BooleanField(null=True, blank=True)
+    is_emergency= models.BooleanField(null=True, blank=True)
+    is_contagious = models.BooleanField(null=True, blank=True)
+    needs_oxygen = models.BooleanField(null=True, blank=True)
+    is_discharged = models.BooleanField(null=True, blank=True)
     history = HistoricalRecords()
 
     # models.ForeignKey(subjects, blank=True, null=True)

@@ -60,6 +60,9 @@ class OTPAuthentication(views.APIView):
         else:
             token = TOTP(item)
             otp = token.token()
+            print(otp)
+            if(len(str(otp))==5):
+                otp=otp*10
             # otp = 999999
             # send_mail(
             #     subject="Your OTP Password",

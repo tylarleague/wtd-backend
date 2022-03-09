@@ -57,6 +57,8 @@ class CreateOrderSerializer(serializers.ModelSerializer):
     custom_id = serializers.ReadOnlyField()
     appointment_approval = Base64ImageField(
         max_length=None, use_url=True, required=False)
+    discharge_approval = Base64ImageField(
+        max_length=None, use_url=True, required=False)
     class Meta:
         model = Order
         fields = "__all__"
@@ -77,6 +79,10 @@ class GetOrdersSerializer(serializers.ModelSerializer):
     provider_id = serializers.PrimaryKeyRelatedField(source='provider', queryset=ProviderProfile.objects.all(), write_only=True, allow_null=True)
     order_extra_services = extraServicesSerializer(required=False, many=True, read_only=True)
     order_related_report = UpdateAmbReportSerializer()
+    appointment_approval = Base64ImageField(
+        max_length=None, use_url=True, required=False)
+    discharge_approval = Base64ImageField(
+        max_length=None, use_url=True, required=False)
     class Meta:
         model = Order
         fields = "__all__"
