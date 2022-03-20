@@ -75,8 +75,8 @@ def announce_status_change(sender, instance, created, **kwargs):
             #                      "event": "Rejected By Provider",
             #                      "object": instance.id})
             if instance.operator:
-                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم انشاؤه",
-                        "has been created")
+                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم رفضه",
+                        "has been rejected")
             else:
                 for operation_profile in operation_profiles:
                     if operation_profile.is_available is True:
@@ -109,8 +109,8 @@ def announce_status_change(sender, instance, created, **kwargs):
             #                      "event": "Started By Provider",
             #                      "object": instance.id})
             if instance.operator:
-                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم انشاؤه",
-                        "has been created")
+                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم بدء الطلب",
+                        "has been started")
             else:
                 for operation_profile in operation_profiles:
                     if operation_profile.is_available is True:
@@ -138,8 +138,8 @@ def announce_status_change(sender, instance, created, **kwargs):
             #                      "event": "Delivered",
             #                      "object": instance.id})
             if instance.operator:
-                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم انشاؤه",
-                        "has been created")
+                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم الانتهاء",
+                        "has been completed")
             else:
                 for operation_profile in operation_profiles:
                     if operation_profile.is_available is True:
