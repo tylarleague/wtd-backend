@@ -8,7 +8,7 @@ import json
 # from notifications.models import Notification
 # from notifications.serializers import NotificationListSerializer
 from accounts.models import OperationProfile
-from orders.models import Order, AmbReport
+from orders.models import Order, AmbReport, OrderPossibleProvider
 # from django.core import serializers
 # from django.forms.models import model_to_dict
 # from channels.layers import get_channel_layer
@@ -38,122 +38,127 @@ operation_profiles = OperationProfile.objects.all()
 @receiver(post_save, sender=Order)
 def announce_status_change(sender, instance, created, **kwargs):
     print('INSTANCE: ', "966" + instance.owner.user.phone_number)
-    if created:
-            print('SIGNALS: created new order', instance.status)
-            if instance.payment_authorized:
-                print('I am suppose to send sms to client', instance.owner.user.phone_number)
-                sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم استلامه و في انتظار الموافقة",
-                        "has been created, waiting for approval")
-    else:
-        print('SIGNALS: updated order', instance.status)
-        if instance.status == 'open' and instance.payment_authorized:
-            print('I am suppose to update operation')
-            # channel_layer = get_channel_layer()
-            # async_to_sync(channel_layer.group_send)(
-            #     "update_order", {"type": "change.update_order",
-            #                      "event": "Open",
-            #                      "object": instance.id})
-            if instance.operator:
-                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم انشاؤه",
-                        "has been created")
-            else:
-                for operation_profile in operation_profiles:
-                    if operation_profile.is_available is True:
-                        print('operation_profile', operation_profile.user.phone_number)
-                        sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم انشاؤه",
-                                "has been created")
-            print('I am suppose to send sms to client', instance.owner.user.phone_number)
-            sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم استلامه و في انتظار الموافقة", "has been created, waiting for approval")
-        elif instance.status == 'sent_to_provider' and instance.payment_authorized:
-            print('I am suppose to send sms to provider', instance.provider.user.phone_number)
-            sendSMS(instance.custom_id, instance.provider.user.phone_number, " تم ارساله إليك من قبل وتد، رجاء تحديث الصفحة و من ثم القبول أو الرفض", "has been sent to you by Wtd, please refresh your page, then approve or decline")
-        elif instance.status == 'rejected_by_provider':
-            print('I am suppose to update operation')
-            # channel_layer = get_channel_layer()
-            # async_to_sync(channel_layer.group_send)(
-            #     "update_order", {"type": "change.update_order",
-            #                      "event": "Rejected By Provider",
-            #                      "object": instance.id})
-            if instance.operator:
-                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم رفضه",
-                        "has been rejected")
-            else:
-                for operation_profile in operation_profiles:
-                    if operation_profile.is_available is True:
-                        print('operation_profile', operation_profile.user.phone_number)
-                        sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم رفضه من مقدم الخدمة",
-                                "has been rejected by provider")
-        # elif instance.status == 'approved_by_provider':
-        #     print('I am suppose to update operation')
-        #     # channel_layer = get_channel_layer()
-        #     # async_to_sync(channel_layer.group_send)(
-        #     #     "update_order", {"type": "change.update_order",
-        #     #                      "event": "Approved By Provider",
-        #     #                      "object": instance.id})
-        #     for operation_profile in operation_profiles:
-        #         if operation_profile.is_available is True:
-        #             print('operation_profile', operation_profile.user.phone_number)
-        #             sendSMS(instance.custom_id, operation_profile.user.phone_number, "تمت الموافقة عليه من مقدم الخدمة",
-        #                     "has been accepted by provider")
-        elif instance.status == 'scheduled':
-            print('I am suppose to send sms to client', instance.owner.user.phone_number)
-            sendSMS(instance.custom_id, instance.owner.user.phone_number, "تمت الموافقة عليه و جدولته", "has been approved and scheduled")
-            print('I am suppose to send sms to provider', instance.provider.user.phone_number)
-            sendSMS(instance.custom_id, instance.provider.user.phone_number, "تمت الموافقة عليه و جدولته",
-                    "has been approved and scheduled")
-        elif instance.status == 'started_by_provider':
-            print('I am suppose to update operation')
-            # channel_layer = get_channel_layer()
-            # async_to_sync(channel_layer.group_send)(
-            #     "update_order", {"type": "change.update_order",
-            #                      "event": "Started By Provider",
-            #                      "object": instance.id})
-            if instance.operator:
-                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم بدء الطلب",
-                        "has been started")
-            else:
-                for operation_profile in operation_profiles:
-                    if operation_profile.is_available is True:
-                        print('operation_profile', operation_profile.user.phone_number)
-                        sendSMS(instance.custom_id, operation_profile.user.phone_number, "بدأ من قبل مقدم الخدمة",
-                                "has been started by provider")
-            print('I am suppose to send sms to client', instance.owner.user.phone_number)
-            sendSMS(instance.custom_id, instance.owner.user.phone_number, "، سيارة الاسعاف في طريقها إليك",
-                    "has been started, an ambulance is on its way to you")
-        elif instance.status == 'canceled':
-            if instance.owner:
-                print('I am suppose to send sms to client', instance.owner.user.phone_number)
-                sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم إلغاؤه",
-                        "has been canceled")
-            if instance.provider:
-                print('I am suppose to send sms to provider', instance.provider.user.phone_number)
-                sendSMS(instance.custom_id, instance.provider.user.phone_number, "تم إلغاؤه",
-                        "has been canceled")
-            refundAmount(instance)
-        elif instance.status == 'done':
-            print('I am suppose to update operation')
-            # channel_layer = get_channel_layer()
-            # async_to_sync(channel_layer.group_send)(
-            #     "update_order", {"type": "change.update_order",
-            #                      "event": "Delivered",
-            #                      "object": instance.id})
-            if instance.operator:
-                sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم الانتهاء",
-                        "has been completed")
-            else:
-                for operation_profile in operation_profiles:
-                    if operation_profile.is_available is True:
-                        print('operation_profile', operation_profile.user.phone_number)
-                        sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم الانتهاء منه",
-                                "has been finished")
-            print('I am suppose to send sms to client', instance.owner.user.phone_number)
-            sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم الانتهاء منه",
-                    "has been finished")
-
-            # Capture Money
-            # print('instance.order_related_payments', instance.order_related_payments)
+    if True:
+        if created:
+                print('SIGNALS: created new order', instance.status)
+                if instance.payment_authorized:
+                    print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                    sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم استلامه و في انتظار الموافقة",
+                            "has been created, waiting for approval")
         else:
-            print('Unknown status at Signals')
+            print('SIGNALS: updated order', instance.status)
+            if instance.status == 'open' and instance.payment_authorized:
+                # send_order_to_provider(instance) #TEST
+                print('I am suppose to update operation')
+                # channel_layer = get_channel_layer()
+                # async_to_sync(channel_layer.group_send)(
+                #     "update_order", {"type": "change.update_order",
+                #                      "event": "Open",
+                #                      "object": instance.id})
+                if instance.operator:
+                    sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم انشاؤه",
+                            "has been created")
+                else:
+                    for operation_profile in operation_profiles:
+                        if operation_profile.is_available is True:
+                            print('operation_profile', operation_profile.user.phone_number)
+                            sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم انشاؤه",
+                                    "has been created")
+                print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم استلامه و في انتظار الموافقة", "has been created, waiting for approval")
+            elif instance.status == 'sent_to_provider' and instance.payment_authorized:
+                print('I am suppose to send sms to provider', instance.provider.user.phone_number)
+                sendSMS(instance.custom_id, instance.provider.user.phone_number, " تم ارساله إليك من قبل وتد، رجاء تحديث الصفحة و من ثم القبول أو الرفض", "has been sent to you by Wtd, please refresh your page, then approve or decline")
+            elif instance.status == 'rejected_by_provider':
+                # send_order_to_provider(instance)
+                print('I am suppose to update operation')
+                # channel_layer = get_channel_layer()
+                # async_to_sync(channel_layer.group_send)(
+                #     "update_order", {"type": "change.update_order",
+                #                      "event": "Rejected By Provider",
+                #                      "object": instance.id})
+                if instance.operator:
+                    sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم رفضه",
+                            "has been rejected")
+                else:
+                    for operation_profile in operation_profiles:
+                        if operation_profile.is_available is True:
+                            print('operation_profile', operation_profile.user.phone_number)
+                            sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم رفضه من مقدم الخدمة",
+                                    "has been rejected by provider")
+            # elif instance.status == 'approved_by_provider':
+            #     print('I am suppose to update operation')
+            #     # channel_layer = get_channel_layer()
+            #     # async_to_sync(channel_layer.group_send)(
+            #     #     "update_order", {"type": "change.update_order",
+            #     #                      "event": "Approved By Provider",
+            #     #                      "object": instance.id})
+            #     for operation_profile in operation_profiles:
+            #         if operation_profile.is_available is True:
+            #             print('operation_profile', operation_profile.user.phone_number)
+            #             sendSMS(instance.custom_id, operation_profile.user.phone_number, "تمت الموافقة عليه من مقدم الخدمة",
+            #                     "has been accepted by provider")
+            elif instance.status == 'scheduled':
+                print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                sendSMS(instance.custom_id, instance.owner.user.phone_number, "تمت الموافقة عليه و جدولته", "has been approved and scheduled")
+                print('I am suppose to send sms to provider', instance.provider.user.phone_number)
+                sendSMS(instance.custom_id, instance.provider.user.phone_number, "تمت الموافقة عليه و جدولته",
+                        "has been approved and scheduled")
+            elif instance.status == 'started_by_provider':
+                print('I am suppose to update operation')
+                # channel_layer = get_channel_layer()
+                # async_to_sync(channel_layer.group_send)(
+                #     "update_order", {"type": "change.update_order",
+                #                      "event": "Started By Provider",
+                #                      "object": instance.id})
+                if instance.operator:
+                    sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم بدء الطلب",
+                            "has been started")
+                else:
+                    for operation_profile in operation_profiles:
+                        if operation_profile.is_available is True:
+                            print('operation_profile', operation_profile.user.phone_number)
+                            sendSMS(instance.custom_id, operation_profile.user.phone_number, "بدأ من قبل مقدم الخدمة",
+                                    "has been started by provider")
+                print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                sendSMS(instance.custom_id, instance.owner.user.phone_number, "، سيارة الاسعاف في طريقها إليك",
+                        "has been started, an ambulance is on its way to you")
+            elif instance.status == 'canceled':
+                # delete_all_related_order_providers(instance)
+                if instance.owner:
+                    print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                    sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم إلغاؤه",
+                            "has been canceled")
+                if instance.provider:
+                    print('I am suppose to send sms to provider', instance.provider.user.phone_number)
+                    sendSMS(instance.custom_id, instance.provider.user.phone_number, "تم إلغاؤه",
+                            "has been canceled")
+                refundAmount(instance)
+            elif instance.status == 'done':
+                # delete_all_related_order_providers(instance)
+                print('I am suppose to update operation')
+                # channel_layer = get_channel_layer()
+                # async_to_sync(channel_layer.group_send)(
+                #     "update_order", {"type": "change.update_order",
+                #                      "event": "Delivered",
+                #                      "object": instance.id})
+                if instance.operator:
+                    sendSMS(instance.custom_id, instance.operator.user.phone_number, "تم الانتهاء",
+                            "has been completed")
+                else:
+                    for operation_profile in operation_profiles:
+                        if operation_profile.is_available is True:
+                            print('operation_profile', operation_profile.user.phone_number)
+                            sendSMS(instance.custom_id, operation_profile.user.phone_number, "تم الانتهاء منه",
+                                    "has been finished")
+                print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                sendSMS(instance.custom_id, instance.owner.user.phone_number, "تم الانتهاء منه",
+                        "has been finished")
+
+                # Capture Money
+                # print('instance.order_related_payments', instance.order_related_payments)
+            else:
+                print('Unknown status at Signals')
 
 
 def sendSMS(order_number, phone_number, arabic_text, english_text):
@@ -213,3 +218,25 @@ def refundAmount(order):
             print('refund error', e)
     else:
         print('No Payment to refund')
+
+
+# def send_order_to_provider(order):
+#     order_sorted_providers = order.order_possible_providers.all().order_by('-importance')
+#     if order_sorted_providers:
+#         print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
+#         if order_sorted_providers.first().provider:
+#             order.provider= order_sorted_providers.first().provider
+#             order.status = 'sent_to_provider'
+#             OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+#             order.save()
+#     else:
+#         order.provider = None
+#         order.save()
+#         print('No Possible Providers! Assign manually')
+
+# def delete_all_related_order_providers(order):
+#     order_sorted_providers = order.order_possible_providers.all().order_by('-importance')
+#     if order_sorted_providers:
+#         OrderPossibleProvider.objects.filter(order=order).delete()
+
+

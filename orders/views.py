@@ -9,7 +9,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 import http.client
-from orders.models import Order, Invoice, ExtraServices, AmbReport, Region, RegionPoint, City, CityPoint, SpecialLocation, SpecialLocationPoint
+from orders.models import Order, Invoice, ExtraServices, AmbReport, Region, RegionPoint, City, CityPoint, SpecialLocation, SpecialLocationPoint, OrderPossibleProvider
 from orders.serializers import OrderSerializer, CreateOrderSerializer, GetOrdersSerializer, extraServicesSerializer, UpdateAmbReportSerializer
 from rest_framework.response import Response
 import requests
@@ -20,7 +20,31 @@ from geojson import Point, Feature, FeatureCollection
 from turfpy.measurement import centroid
 from geojson import Point, MultiPolygon, Feature, Polygon, FeatureCollection
 from django.core import serializers
+from geojson import Point, Feature
+# from ipyleaflet import Map, GeoJSON
+from turfpy.transformation import circle
 from turfpy.measurement import area
+from accounts.models import ProviderProfile, User, Organization, OperationProfile
+from django.db.models import Q
+from datetime import datetime, timedelta
+from unifonicnextgen.unifonicnextgen_client import UnifonicnextgenClient
+from unifonicnextgen.configuration import Configuration
+from unifonicnextgen.exceptions.api_exception import APIException
+import heapq
+
+basic_auth_user_name = 'e637a3df-8da4-4cd2-b524-5a5409e811f9'
+basic_auth_password = '0UpBuW8KAxwOWkJn8Y7lKBbrFEz4aTFn87z3kFwwpWhFB3XJAec2Dn4BTeCakSlkdhGAfCbxkWK'
+client = UnifonicnextgenClient(basic_auth_user_name, basic_auth_password)
+rest_controller = client.rest
+app_sid = 'Q0hq8Uu4tcJf1UcsgAP7DSCsP8VHil'
+sender_id = 'Wtd.Care'
+# body = 'رسااالة من وتد يلد'
+recipient = 966562156104
+response_type = 'JSON'
+correlation_id = '""'
+base_encode = True
+status_callback = 'sent'
+
 class OrderViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -53,7 +77,7 @@ class CreateOrderView(generics.CreateAPIView):
         distance_in_kilo = round(distance['rows'][0]['elements'][0]['distance']['value'] / 1000, 1);
         duration_in_minutes = round(distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0);
         print('distance_in_kilo', distance_in_kilo)
-        print('duration_in_minutes', duration_in_minutes)
+        print('duration_in_minutes', duration_in_minutes, type(duration_in_minutes))
         cost = 0
 
         from_point = Point([from_location['lat'], from_location['lng']])
@@ -250,8 +274,207 @@ class CreateOrderView(generics.CreateAPIView):
         report = AmbReport.objects.create(order=order)
         print('myInv', myInv)
         print('report', report)
+
+
+        print('===========Automate to Provider============')
+
+        create_order_providers(order, from_location['lat'], from_location['lng'], to_location['lat'], to_location['lng'], duration_in_minutes)
+        # from_location['lat']
+        # from_location['lng']
+        # order
+        #
+        # from_location_lat = from_location['lat']
+        # from_location_lng = from_location['lng']
+        # center_circle_from_location = Feature(geometry=Point((from_location_lat, from_location_lng)))
+        # circle_of_from_location = circle(center_circle_from_location, radius=30, steps=10, units='km')
+        # allOrganizations = Organization.objects.all()
+        # orgsWithinRange = []
+        # for currentOrg in allOrganizations:
+        #     print('testing OrgLocation', currentOrg)
+        #     currentOrgLocation = Point([currentOrg.lat, currentOrg.lng])
+        #     if boolean_point_in_polygon(currentOrgLocation, circle_of_from_location):
+        #         print('ORG WITHIN RANGE', currentOrgLocation)
+        #         org_to_pickup_distance = gmaps.distance_matrix((currentOrg.lat, currentOrg.lng),
+        #                                                        (from_location['lat'], from_location['lng']),
+        #                                                        mode='driving')
+        #         org_to_pickup_duration_in_minutes = round(
+        #             org_to_pickup_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
+        #         my_arrival_time_temp = datetime.strptime(str(order.arrival_time), "%H:%M:%S")
+        #         pickup_dropoff_operation_duration = 20
+        #         full_duration_before = org_to_pickup_duration_in_minutes + float(duration_in_minutes) + pickup_dropoff_operation_duration
+        #         time_block_start = (
+        #                 my_arrival_time_temp - timedelta(minutes=full_duration_before)).time()
+        #         if order.order_type == 'ONE_WAY':
+        #             dropoff_to_org_distance = gmaps.distance_matrix((to_location['lat'], to_location['lng']),
+        #                                                             (currentOrg.lat, currentOrg.lng), mode='driving')
+        #             dropoff_to_org_duration_in_minutes = round(
+        #                 dropoff_to_org_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
+        #             time_block_end = (
+        #                     my_arrival_time_temp + timedelta(minutes=dropoff_to_org_duration_in_minutes)).time()
+        #         else:
+        #             full_duration_after = (order.waiting_time * 60) + pickup_dropoff_operation_duration + float(duration_in_minutes) + org_to_pickup_duration_in_minutes
+        #             time_block_end = (
+        #                     my_arrival_time_temp + timedelta(minutes=full_duration_after)).time()
+        #
+        #         orgtuple = (currentOrg, org_to_pickup_duration_in_minutes, time_block_start, time_block_end)
+        #         orgsWithinRange.append(orgtuple)
+        # print('allOrganizations', allOrganizations, len(allOrganizations))
+        # print('orgsWithinRange', orgsWithinRange, len(orgsWithinRange))
+        # sortedOrgsWithinRange = sorted(orgsWithinRange, key=lambda distance_from_location: distance_from_location[1])
+        # print('sortedOrgsWithinRange', sortedOrgsWithinRange, len(sortedOrgsWithinRange))
+        # for currentOrgWithinRange in sortedOrgsWithinRange:
+        #     for currentProvider in currentOrgWithinRange[0].organization_providers.all():
+        #         add_provider = True
+        #         print('currentProvider for currentOrWithinRange', currentProvider, "-", currentOrgWithinRange)
+        #         provider_orders_for_that_day = currentProvider.provider_related_orders.filter(
+        #             Q(order_date=order.order_date) & Q(approved_by_provider=True) & Q(approved_by_client=True))
+        #         print('provider_orders_for_that_day', provider_orders_for_that_day)
+        #         if provider_orders_for_that_day.exists():
+        #             for order_of_provider in provider_orders_for_that_day:
+        #                 print('order_of_provider', order_of_provider.arrival_time, currentOrgWithinRange[2], currentOrgWithinRange[3])
+        #                 if time_in_range(currentOrgWithinRange[2], currentOrgWithinRange[3], order_of_provider.arrival_time):
+        #                     print('inside time range!')
+        #                     add_provider = False
+        #             if add_provider:
+        #                 print('not inside time range, I will add provider')
+        #                 OrderPossibleProvider.objects.create(order=order, provider=currentProvider,
+        #                                                      importance=create_provider_score(currentOrgWithinRange[1],
+        #                                                                                       currentOrgWithinRange[
+        #                                                                                           0].percentage))
+        #         else:
+        #             print('no orders that day, so I will add provider')
+        #             OrderPossibleProvider.objects.create(order=order, provider=currentProvider, importance=create_provider_score(currentOrgWithinRange[1],
+        #                                                                                 currentOrgWithinRange[
+        #                                                                                     0].percentage))
+        # order_sorted_providers= order.order_possible_providers.all().order_by('-importance')
+        # print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
+
+
+        print('===========FINSH Automate to Provider============')
         response_serializer = GetOrdersSerializer(order)
         return Response(response_serializer.data)
+
+
+
+def create_order_providers(order, from_location_lat, from_location_lng,to_location_lat, to_location_lng,duration_in_minutes):
+    gmaps = googlemaps.Client(key='AIzaSyDVWqaOxUtds5e2z9OBWf79q5IASU7uBIs')
+    center_circle_from_location = Feature(geometry=Point((from_location_lat, from_location_lng)))
+    circle_of_from_location = circle(center_circle_from_location, radius=30, steps=10, units='km')
+    allOrganizations = Organization.objects.all()
+    orgsWithinRange = []
+    for currentOrg in allOrganizations:
+        print('testing OrgLocation', currentOrg)
+        currentOrgLocation = Point([currentOrg.lat, currentOrg.lng])
+        if boolean_point_in_polygon(currentOrgLocation, circle_of_from_location):
+            print('ORG WITHIN RANGE', currentOrgLocation)
+            org_to_pickup_distance = gmaps.distance_matrix((currentOrg.lat, currentOrg.lng),
+                                                           (from_location_lat, from_location_lng),
+                                                           mode='driving')
+            org_to_pickup_duration_in_minutes = round(
+                org_to_pickup_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
+            my_arrival_time_temp = datetime.strptime(str(order.arrival_time), "%H:%M:%S")
+            pickup_dropoff_operation_duration = 20
+            full_duration_before = org_to_pickup_duration_in_minutes + float(
+                duration_in_minutes) + pickup_dropoff_operation_duration
+            time_block_start = (
+                    my_arrival_time_temp - timedelta(minutes=full_duration_before)).time()
+            if order.order_type == 'ONE_WAY':
+                dropoff_to_org_distance = gmaps.distance_matrix((to_location_lat, to_location_lng),
+                                                                (currentOrg.lat, currentOrg.lng), mode='driving')
+                dropoff_to_org_duration_in_minutes = round(
+                    dropoff_to_org_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
+                time_block_end = (
+                        my_arrival_time_temp + timedelta(minutes=dropoff_to_org_duration_in_minutes)).time()
+            else:
+                full_duration_after = (order.waiting_time * 60) + (pickup_dropoff_operation_duration*3) + float(
+                    duration_in_minutes) + org_to_pickup_duration_in_minutes
+                time_block_end = (
+                        my_arrival_time_temp + timedelta(minutes=full_duration_after)).time()
+
+            orgtuple = (currentOrg, org_to_pickup_duration_in_minutes, time_block_start, time_block_end)
+            orgsWithinRange.append(orgtuple)
+    # print('allOrganizations', allOrganizations, len(allOrganizations))
+    # print('orgsWithinRange', orgsWithinRange, len(orgsWithinRange))
+    sortedOrgsWithinRange = sorted(orgsWithinRange, key=lambda distance_from_location: distance_from_location[1])
+    print('sortedOrgsWithinRange', sortedOrgsWithinRange, len(sortedOrgsWithinRange))
+    for currentOrgWithinRange in sortedOrgsWithinRange:
+        for currentProvider in currentOrgWithinRange[0].organization_providers.all():
+            add_provider = True
+            print('currentProvider for currentOrWithinRange', currentProvider, "-", currentOrgWithinRange)
+            provider_orders_for_that_day = currentProvider.provider_related_orders.filter(
+                Q(order_date=order.order_date) & Q(approved_by_provider=True) & Q(approved_by_client=True))
+            print('provider_orders_for_that_day', provider_orders_for_that_day)
+            if provider_orders_for_that_day.exists():
+                for order_of_provider in provider_orders_for_that_day:
+                    print('order_of_provider', order_of_provider.arrival_time, currentOrgWithinRange[2],
+                          currentOrgWithinRange[3])
+                    if order_of_provider.order_block_start and order_of_provider.order_block_end:
+                        #call the overlap function
+                        if check_time_block_overlap(order_of_provider.order_block_start, order_of_provider.order_block_end, currentOrgWithinRange[2], currentOrgWithinRange[3]):
+                            print('time block overlap!')
+                            add_provider = False
+                    else:
+                        if time_in_range(currentOrgWithinRange[2], currentOrgWithinRange[3],
+                                         order_of_provider.arrival_time):
+                            print('inside time range!')
+                            add_provider = False
+                if add_provider:
+                    print('not inside time range, I will add provider')
+                    OrderPossibleProvider.objects.create(order=order, provider=currentProvider,
+                                                         importance=create_provider_score(currentOrgWithinRange[1],
+                                                                                          currentOrgWithinRange[
+                                                                                              0].percentage))
+            else:
+                print('no orders that day, so I will add provider')
+                OrderPossibleProvider.objects.create(order=order, provider=currentProvider,
+                                                     importance=create_provider_score(currentOrgWithinRange[1],
+                                                                                      currentOrgWithinRange[
+                                                                                          0].percentage))
+    # order_sorted_providers = order.order_possible_providers.all().order_by('-importance')
+    # print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
+
+
+
+
+# def send_order_to_provider(order):
+#     order_sorted_providers = order.order_possible_providers.all().order_by('-importance')
+#     if order_sorted_providers:
+#         print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
+#         if order.provider:
+#             #Remove Old Provider
+#             order.provider = None
+#             print('order_sorted_providers.first()', order_sorted_providers.first())
+#     else:
+#         print('No Possible Providers! Assign manually')
+
+
+
+def create_provider_score(provider_distance, provider_percentage, emergency=False):
+    """Return provider score"""
+    distance_importance = 0.4
+    percentage_importance = 0.6
+    provider_distance_capped = (100*provider_distance)/30
+    wtd_percentage= 100-provider_percentage
+    if emergency:
+        print('Order is Emergency')
+        distance_importance = 0.9
+        percentage_importance = 0.1
+    return ((provider_distance_capped * distance_importance) + (wtd_percentage*percentage_importance))/2
+
+
+def time_in_range(start, end, x):
+    """Return true if x is in the range [start, end]"""
+    if start <= end:
+        return start <= x <= end
+    else:
+        return start <= x or x <= end
+
+def check_time_block_overlap(s1, e1, s2, e2):
+    print('inside check_time_block_overlap')
+    if s1 <= e1:
+        return s1 <= s2 <= e1 or s1 <= e2 <= e1
+    else:
+        return s1 <= s2 or s2 <= e1 or s1 <= e2 or e2 <= e1
 
 
 @api_view(['POST', ])
@@ -583,6 +806,57 @@ class ApproveOrderByClient(generics.UpdateAPIView):
     serializer_class = GetOrdersSerializer
     queryset = Order.objects.all()
 
+    def perform_update(self, serializer):
+        # print('test***************', self.kwargs['pk'], self.request.data['payment_authorized'])
+        # print('payment_authorized of serialized', serializer.data['payment_authorized'])
+        current_order = Order.objects.get(id=self.kwargs['pk'])
+        # print('payment_authorized of current_order', current_order.payment_authorized)
+        order_sorted_providers = current_order.order_possible_providers.all().order_by('-importance')
+        # if self.request.data['payment_authorized'] == True and current_order.payment_authorized == False:
+        # if self.request.data['status'] == 'canceled':
+        #     delete_all_related_order_providers(current_order)
+        if (self.request.data['payment_authorized'] == True and current_order.payment_authorized == False):
+                while order_sorted_providers:
+                    print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
+                    if order_sorted_providers.first().provider.is_available:
+                        serializer.save(provider=order_sorted_providers.first().provider, order_block_start=order_sorted_providers.first().order_block_start, order_block_end=order_sorted_providers.first().order_block_end, status='sent_to_provider')
+                        OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+                        break
+                    else:
+                        OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+                        order_sorted_providers = current_order.order_possible_providers.all().order_by('-importance')
+                        # order.save()
+                else:
+                    serializer.save(provider=None, order_block_start=None, order_block_end=None)
+                    print('No Possible Providers! Assign manually')
+                    if current_order.operator:
+                        sendSMS(current_order.custom_id, current_order.operator.user.phone_number,
+                                "يتطلب تعيين مقدم الخدمة يدويًا",
+                                "must be assigned manually")
+                    else:
+                        for operation_profile in OperationProfile.objects.all():
+                            if operation_profile.is_available is True:
+                                print('operation_profile', operation_profile.user.phone_number)
+                                sendSMS(current_order.custom_id, operation_profile.user.phone_number,
+                                        "يتطلب تعيين مقدم الخدمة يدويًا",
+                                        "must be assigned manually")
+
+
+
+# def send_order_to_provider(order):
+#     order_sorted_providers = order.order_possible_providers.all().order_by('-importance')
+#     if order_sorted_providers:
+#         print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
+#         if order_sorted_providers.first().provider:
+#             order.provider= order_sorted_providers.first().provider
+#             order.status = 'sent_to_provider'
+#             OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+#             order.save()
+#     else:
+#         order.provider = None
+#         order.save()
+#         print('No Possible Providers! Assign manually')
+
 
 # SendOrderToAmbView
 class SendOrderToAmbView(generics.UpdateAPIView):
@@ -610,13 +884,67 @@ class ActionOrderByProvider(generics.UpdateAPIView):
     serializer_class = GetOrdersSerializer
     queryset = Order.objects.all()
 
-    # ActionOrderByOperation
+    def perform_update(self, serializer):
+        # print('test***************', self.kwargs['pk'], self.request.data['payment_authorized'])
+        # print('payment_authorized of serialized', serializer.data['payment_authorized'])
+        current_order = Order.objects.get(id=self.kwargs['pk'])
+        print('payment_authorized of current_order', current_order.payment_authorized)
+        order_sorted_providers = current_order.order_possible_providers.all().order_by('-importance')
+        if self.request.data['status'] == 'done':
+            delete_all_related_order_providers(current_order)
+        if self.request.data['status'] == 'rejected_by_provider':
+            while order_sorted_providers:
+                print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
+                if order_sorted_providers.first().provider.is_available:
+                    serializer.save(provider=order_sorted_providers.first().provider, order_block_start=order_sorted_providers.first().order_block_start, order_block_end=order_sorted_providers.first().order_block_end,status='sent_to_provider')
+                    OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+                    break
+                else:
+                    OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+                    order_sorted_providers = current_order.order_possible_providers.all().order_by('-importance')
+            else:
+                serializer.save(provider=None, order_block_start=None, order_block_end=None)
+                print('No Possible Providers! Assign manually')
+                if current_order.operator:
+                    sendSMS(current_order.custom_id, current_order.operator.user.phone_number, "يتطلب تعيين مقدم الخدمة يدويًا",
+                            "must be assigned manually")
+                else:
+                    for operation_profile in OperationProfile.objects.all():
+                        if operation_profile.is_available is True:
+                            print('operation_profile', operation_profile.user.phone_number)
+                            sendSMS(current_order.custom_id, operation_profile.user.phone_number,
+                                    "يتطلب تعيين مقدم الخدمة يدويًا",
+                                    "must be assigned manually")
+
+
 class ActionOrderByOperation(generics.UpdateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = GetOrdersSerializer
     queryset = Order.objects.all()
 
+    def perform_update(self, serializer):
+        current_order = Order.objects.get(id=self.kwargs['pk'])
+        print('payment_authorized of current_order', current_order.payment_authorized)
+        if self.request.data['status'] == 'canceled':
+            delete_all_related_order_providers(current_order)
+
+
+def delete_all_related_order_providers(order):
+    order_sorted_providers = order.order_possible_providers.all().order_by('-importance')
+    if order_sorted_providers:
+        OrderPossibleProvider.objects.filter(order=order).delete()
+
+def sendSMS(order_number, phone_number, arabic_text, english_text):
+    try:
+        body = "Order with number " + str(order_number) + " " + english_text + "\n" + "طلب رقم " + str(order_number) + " " + arabic_text
+        result = rest_controller.create_send_message(app_sid, sender_id, body,
+                                                     '966' + phone_number,
+                                                     response_type, correlation_id, base_encode,
+                                                     status_callback),
+        print('RESSSSULT OF SMS', result)
+    except APIException as e:
+        print('ERRROR OF SMS', e)
 
 # class paymentInfo_view(views.APIView):
 #     permission_classes = [permissions.IsAuthenticated]

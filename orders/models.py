@@ -113,6 +113,8 @@ class Order(models.Model):
     is_contagious = models.BooleanField(null=True, blank=True)
     needs_oxygen = models.BooleanField(null=True, blank=True)
     is_discharged = models.BooleanField(null=True, blank=True)
+    order_block_start = models.TimeField(null=True, blank=True)
+    order_block_end = models.TimeField(null=True, blank=True)
     history = HistoricalRecords()
 
     # models.ForeignKey(subjects, blank=True, null=True)
@@ -155,6 +157,7 @@ class Order(models.Model):
         if(self):
             return 'WTD{}{}'.format(datetime.strftime(self.order_date, '%y%m%d'), self.id)
         return None
+
     # return 'WTD{}{}'.format(datetime.strptime(str(self.arrival_time), "%H:%M:%S"), self.id)
     # datetime.strptime(str(self.arrival_time), "%H:%M:%S")
         # return 'WTD{}{}'.format(self.id, self.id)
@@ -195,3 +198,17 @@ class ExtraServices(models.Model):
 
     def __str__(self):
         return str(self.id) + " - " + str(self.service_name )
+
+class OrderPossibleProvider(models.Model):
+    order = models.ForeignKey(
+        Order, related_name="order_possible_providers", on_delete=models.CASCADE)
+    provider = models.ForeignKey(
+        ProviderProfile, related_name="provider_possible_orders", on_delete=models.CASCADE)
+    importance = models.FloatField()
+    order_block_start = models.TimeField(null=True, blank=True)
+    order_block_end = models.TimeField(null=True, blank=True)
+    # order = models.ManyToManyField(
+    #     Order, related_name="ordr_extra_services", null=True, blank=True)
+
+    def __str__(self):
+        return "possible provider: " + str(self.provider) + " of order " + str(self.order) + " - importance: " + str(self.importance)
