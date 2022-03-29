@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
+from decimal import Decimal
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,12 +46,14 @@ INSTALLED_APPS = [
     # 'django_otp.plugins.otp_static',
     # 'drf_yasg',
     # 'polymorphic',
+    'constance',
     'accounts',
     'orders.apps.OrdersConfig',
     'otp.apps.OtpConfig',
     # 'channels',
     'simple_history',
     'payments',
+    'constance.backends.database',
 ]
 
 REST_FRAMEWORK = {
@@ -69,6 +72,64 @@ REST_FRAMEWORK = {
 AUTHENTICATION_BACKENDS = (
     ('django.contrib.auth.backends.ModelBackend'),
 )
+
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+
+CONSTANCE_CONFIG = {
+    'STARTING_PRICE': (200, 'Price to start trip when using WTD Equation', int),
+    'KILO_PRICE': (5, 'Price of Kilometer when using WTD Equation', int),
+    'MINUTE_PRICE':   (3, 'Price of Minute when using WTD Equation', int),
+    'WAITING_PRICE': (50, 'Price of HOUR when using WTD Equation and WAITING', int),
+    'ROUND_TRIP_RATIO': (1.5, 'The ratio (Multiple) of 2 way trip', float),
+    'PICKUP_SEARCH_RADIUS':  (40, 'When Auto Assigning order to provider, this is the radius of the circle to search for organizations', int),
+    'ALLOW_SMS_SYSTEM':  (True, 'If Value unchecked, No SMS Notifications will be sent to anyone', bool),
+    'PICKUP_DROPOFF_OPERATION_IN_MINUTES': (20, 'Average time of operation to PickUp/DropOff client', int),
+
+    'SMS_CLIENT_NEW_ORDER_AR': ('تم استلامه و في انتظار الموافقة', 'SMS sent to client when paying', str),
+    'SMS_CLIENT_NEW_ORDER_EN': ('has been created, waiting for approval', 'SMS sent to client when paying', str),
+
+    'SMS_OPERATION_NEW_ORDER_AR': ('تم انشاؤه', 'SMS sent to operation when client pays', str),
+    'SMS_OPERATION_NEW_ORDER_EN': ('has been created', 'SMS sent to operation when client pays', str),
+
+    'SMS_PROVIDER_RECEIVE_ORDER_AR': ('تم ارساله إليك من قبل وتد، رجاء تحديث الصفحة و من ثم القبول أو الرفض', 'SMS sent to provider when new order is received', str),
+    'SMS_PROVIDER_RECEIVE_ORDER_EN': ('has been sent to you by Wtd, please refresh your page, then approve or decline', 'SMS sent to provider when new order is received', str),
+
+    'SMS_OPERATION_PROVIDER_REJECTED_AR': ('تم رفضه', 'SMS sent to operation when a provider rejects an order', str),
+    'SMS_OPERATION_PROVIDER_REJECTED_EN': ('has been rejected', 'SMS sent to operation when a provider rejects an order', str),
+
+    'SMS_OPERATION_PROVIDER_ACCEPTED_AR': ('تمت الموافقة عليه و جدولته', 'SMS sent to operation when a provider accepts an order', str),
+    'SMS_OPERATION_PROVIDER_ACCEPTED_EN': ('has been approved and scheduled', 'SMS sent to operation when a provider accepts an order', str),
+
+    'SMS_CLIENT_ORDER_APPROVED_AR': ('تمت الموافقة عليه و جدولته', 'SMS sent to client when a provider accepts an order', str),
+    'SMS_CLIENT_ORDER_APPROVED_EN': ('has been approved and scheduled', 'SMS sent to client when a provider accepts an order', str),
+
+    'SMS_OPERATION_PROVIDER_STARTED_AR': ('بدأ من قبل مقدم الخدمة', 'SMS sent to operation when a provider starts an order', str),
+    'SMS_OPERATION_PROVIDER_STARTED_EN': ('has been started by provider', 'SMS sent to operation when a provider starts an order', str),
+
+    'SMS_CLIENT_PROVIDER_STARTED_AR': ('، سيارة الاسعاف في طريقها إليك', 'SMS sent to client when a provider starts an order', str),
+    'SMS_CLIENT_PROVIDER_STARTED_EN': ('has been started, an ambulance is on its way to you', 'SMS sent to client when a provider starts an order', str),
+
+    'SMS_CLIENT_ORDER_CANCELLED_AR': ('تم إلغاؤه', 'SMS sent to client when an order is cancelled', str),
+    'SMS_CLIENT_ORDER_CANCELLED_EN': ('has been canceled', 'SMS sent to client when an order is cancelled', str),
+
+    'SMS_PROVIDER_ORDER_CANCELLED_AR': ('تم إلغاؤه', 'SMS sent to provider when an order is cancelled', str),
+    'SMS_PROVIDER_ORDER_CANCELLED_EN': ('has been canceled', 'SMS sent to provider when an order is cancelled', str),
+
+    'SMS_CLIENT_ORDER_DONE_AR': ('تم الانتهاء منه', 'SMS sent to client when an order is done', str),
+    'SMS_CLIENT_ORDER_DONE_EN': ('has been completed', 'SMS sent to client when an order is done', str),
+
+    'SMS_OPERATION_ORDER_DONE_AR': ('تم الانتهاء منه', 'SMS sent to operation when an order is done', str),
+    'SMS_OPERATION_ORDER_DONE_EN': ('has been completed', 'SMS sent to operation when an order is done', str),
+
+    'SMS_OPERATION_NO_AUTO_ASSIGN_AR': ('يتطلب تعيين مقدم الخدمة يدويًا', 'SMS sent to operation when system cannot send order to Provider Automatically', str),
+    'SMS_OPERATION_NO_AUTO_ASSIGN_EN': ('must be assigned manually', 'SMS sent to operation when system cannot send order to Provider Automatically', str),
+
+
+
+}
+
+# from constance import config
+# getattr(config, 'ACCELERATOR_ACTIVE')
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
