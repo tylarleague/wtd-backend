@@ -382,36 +382,37 @@ def create_order_providers(order, from_location_lat, from_location_lng,to_locati
     allOrganizations = Organization.objects.all()
     orgsWithinRange = []
     for currentOrg in allOrganizations:
-        print('testing OrgLocation', currentOrg)
-        currentOrgLocation = Point([currentOrg.lat, currentOrg.lng])
-        if boolean_point_in_polygon(currentOrgLocation, circle_of_from_location):
-            print('ORG WITHIN RANGE', currentOrgLocation)
-            org_to_pickup_distance = gmaps.distance_matrix((currentOrg.lat, currentOrg.lng),
-                                                           (from_location_lat, from_location_lng),
-                                                           mode='driving')
-            org_to_pickup_duration_in_minutes = round(
-                org_to_pickup_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
-            my_arrival_time_temp = datetime.strptime(str(order.arrival_time), "%H:%M:%S")
-            pickup_dropoff_operation_duration = getattr(config, 'PICKUP_DROPOFF_OPERATION_IN_MINUTES')
-            full_duration_before = org_to_pickup_duration_in_minutes + float(
-                duration_in_minutes) + pickup_dropoff_operation_duration
-            time_block_start = (
-                    my_arrival_time_temp - timedelta(minutes=full_duration_before)).time()
-            if order.order_type == 'ONE_WAY':
-                dropoff_to_org_distance = gmaps.distance_matrix((to_location_lat, to_location_lng),
-                                                                (currentOrg.lat, currentOrg.lng), mode='driving')
-                dropoff_to_org_duration_in_minutes = round(
-                    dropoff_to_org_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
-                time_block_end = (
-                        my_arrival_time_temp + timedelta(minutes=dropoff_to_org_duration_in_minutes)).time()
-            else:
-                full_duration_after = (order.waiting_time * 60) + (pickup_dropoff_operation_duration*3) + float(
-                    duration_in_minutes) + org_to_pickup_duration_in_minutes
-                time_block_end = (
-                        my_arrival_time_temp + timedelta(minutes=full_duration_after)).time()
+        print('testing OrgLocation', currentOrg, currentOrg.lat)
+        if currentOrg.lat and currentOrg.lng:
+            currentOrgLocation = Point([currentOrg.lat, currentOrg.lng])
+            if boolean_point_in_polygon(currentOrgLocation, circle_of_from_location):
+                print('ORG WITHIN RANGE', currentOrgLocation)
+                org_to_pickup_distance = gmaps.distance_matrix((currentOrg.lat, currentOrg.lng),
+                                                            (from_location_lat, from_location_lng),
+                                                            mode='driving')
+                org_to_pickup_duration_in_minutes = round(
+                    org_to_pickup_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
+                my_arrival_time_temp = datetime.strptime(str(order.arrival_time), "%H:%M:%S")
+                pickup_dropoff_operation_duration = getattr(config, 'PICKUP_DROPOFF_OPERATION_IN_MINUTES')
+                full_duration_before = org_to_pickup_duration_in_minutes + float(
+                    duration_in_minutes) + pickup_dropoff_operation_duration
+                time_block_start = (
+                        my_arrival_time_temp - timedelta(minutes=full_duration_before)).time()
+                if order.order_type == 'ONE_WAY':
+                    dropoff_to_org_distance = gmaps.distance_matrix((to_location_lat, to_location_lng),
+                                                                    (currentOrg.lat, currentOrg.lng), mode='driving')
+                    dropoff_to_org_duration_in_minutes = round(
+                        dropoff_to_org_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
+                    time_block_end = (
+                            my_arrival_time_temp + timedelta(minutes=dropoff_to_org_duration_in_minutes)).time()
+                else:
+                    full_duration_after = (order.waiting_time * 60) + (pickup_dropoff_operation_duration*3) + float(
+                        duration_in_minutes) + org_to_pickup_duration_in_minutes
+                    time_block_end = (
+                            my_arrival_time_temp + timedelta(minutes=full_duration_after)).time()
 
-            orgtuple = (currentOrg, org_to_pickup_duration_in_minutes, time_block_start, time_block_end)
-            orgsWithinRange.append(orgtuple)
+                orgtuple = (currentOrg, org_to_pickup_duration_in_minutes, time_block_start, time_block_end)
+                orgsWithinRange.append(orgtuple)
     # print('allOrganizations', allOrganizations, len(allOrganizations))
     # print('orgsWithinRange', orgsWithinRange, len(orgsWithinRange))
     sortedOrgsWithinRange = sorted(orgsWithinRange, key=lambda distance_from_location: distance_from_location[1])

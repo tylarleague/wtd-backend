@@ -6,7 +6,7 @@ import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
-
+import uuid
 
 class Migration(migrations.Migration):
 
@@ -81,5 +81,41 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='user_operation_profile', to=settings.AUTH_USER_MODEL)),
             ],
+        ),
+        migrations.CreateModel(
+            name='Organization',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=100)),
+                ('lat', models.FloatField(blank=True, null=True)),
+                # ('lng', models.FloatField(blank=True, null=True)),
+                ('percentage', models.IntegerField(default=70)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='SpecialAccounts',
+            fields=[
+                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                ('phone_number', models.CharField(max_length=9, unique=True, validators=[django.core.validators.RegexValidator(message="Phone number must be entered in the format: '555555555'. Up to 9 digits allowed.", regex='^(5)(5|0|3|6|4|9|1|8|7)([0-9]{7})$')], verbose_name='special phone number')),
+            ],
+        ),
+        migrations.RemoveField(
+            model_name='providerprofile',
+            name='approval',
+        ),
+        migrations.AddField(
+            model_name='operationprofile',
+            name='is_available',
+            field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='providerprofile',
+            name='is_available',
+            field=models.BooleanField(default=True),
+        ),
+        migrations.AddField(
+            model_name='providerprofile',
+            name='organization',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='organization_providers', to='accounts.organization'),
         ),
     ]
