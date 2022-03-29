@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view
 from .models import Payment, Order, User
 from rest_framework.response import Response
@@ -13,6 +13,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from payments.serializers import PaymentSerializer
 from rest_framework import generics
+from rest_framework.authtoken.models import Token
 
 # Create your views here.
 
@@ -110,15 +111,6 @@ def pay_view(request):
         url = "https://api.tap.company/v2/charges"
         response = requests.request("POST", url, data=payload, headers=headers)
         data = json.loads(response.text)
-        print('daaataaa', data)
-        # conn.request("POST", "/v2/charges", payload, headers)
-        #
-        # res = conn.getresponse()
-        # data = res.read()
-        #
-        # print("priiinting respoooonse", data.decode("utf-8"))
-
-        # print("data['id']", data['id'])
         payment = Payment.objects.create(
             order=order,
             user=user,
@@ -144,3 +136,35 @@ class CreatePaymentView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PaymentSerializer
     queryset = Order.objects.all()
+
+@api_view(['POST', 'GET' ])
+def add_pay_view(request):
+    if request.method == 'GET':
+        order = Order.objects.get(id=request.GET.get('order_id'))
+        headers = {
+                'authorization': "Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX",
+                'content-type': "application/json",
+                'lang_code':'ar'
+            }
+        innerHeader = {
+                'Authorization': "Token "+ Token.objects.get(user_id=order.owner.user).key,
+                'content-type': "application/json",
+            }
+        url = "https://api.tap.company/v2/invoices/"+request.GET.get('tap_id')
+        response = requests.request("GET", url, data={}, headers=headers)
+        data = json.loads(response.text)
+        payment = {
+                    "order":request.GET.get('order_id'),
+                    "user":order.owner.user.id,
+                    "tap_id":data['transactions'][0]['id'],
+                    "tap_refund_id":data['transactions'][0]['id'],
+                    "status":data['transactions'][0]['status'],
+                    "amount":int(data['transactions'][0]['amount'])
+        }
+        response2 = requests.request("POST", 'https://backend.wtd.care/payment/',
+         data=json.dumps(payment),
+         headers=innerHeader)
+        response3 = requests.request("PATCH", 'https://backend.wtd.care/order/client_action/'+request.GET.get('order_id'),
+         data=json.dumps({"payment_authorized":True}),
+         headers=innerHeader)
+    return redirect('https://www.wtdcare.com/')

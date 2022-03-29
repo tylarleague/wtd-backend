@@ -352,6 +352,102 @@ class CreateOrderView(generics.CreateAPIView):
 
         print('===========FINSH Automate to Provider============')
         response_serializer = GetOrdersSerializer(order)
+        print(str(datetime.now().timestamp()),'here')
+
+        if (request.data['isCreatedInProvider']):
+            requestBody = {
+                "draft": False,
+                "due": int((datetime.now()+ timedelta(minutes = 2)).timestamp()* 1000),
+                "expiry": 1679999977008,
+                "description": "test invoice",
+                "mode": "INVOICE",
+                "note": "test note",
+                "notifications": {
+                    "channels": [
+                        "SMS",
+                        "EMAIL"
+                    ],
+                    "dispatch": True
+                },
+                "currencies": [
+                    "SAR"
+                ],
+                "metadata": {
+                    "udf1": "1",
+                    "udf2": "2",
+                    "udf3": "3"
+                },
+                "charge": {
+                    "receipt": {
+                        "email": True,
+                        "sms": True
+                    },
+                    "statement_descriptor": "delivery on "+str(order.order_date)
+                },
+                "customer": {
+                    "email": "payment.wtd.care@gmail.com",
+                    "first_name": order.owner.user.name,
+                    "last_name": "",
+                    "middle_name": "",
+                    "phone": {
+                        "country_code": "966",
+                        "number": order.owner.user.phone_number
+                    }
+                },
+                "order": {
+                    "amount": myInv.cost,
+                    "currency": "SAR",
+                    "items": [
+                        {
+                            "amount":  myInv.cost,
+                            "currency": "SAR",
+                            "description": "delivery on "+ str(order.order_date),
+                            "discount": {
+                                "type": "P",
+                                "value": 0
+                            },
+                            "image": "",
+                            "name": "Delivery "+order.custom_id,
+                            "quantity": 1
+                        }
+                    ],
+                    "tax": [
+                        {
+                            "description": "Vat",
+                            "name": "VAT",
+                            "rate": {
+                                "type": "P",
+                                "value": 15
+                            }
+                        }
+                    ]
+                },
+                "payment_methods": [
+                    ""
+                ],
+                "post": {
+                    "url": "https://backend.wtd.care/add/payment"
+                },
+                "redirect": {
+                    "url": "https://backend.wtd.care/add/payment?order_id="+str(order.id)
+                },
+                "reference": {
+                    "invoice": "trans_"+order.custom_id,
+                    "order": "order_"+order.custom_id
+                }
+            }
+
+            payload = json.dumps(requestBody)
+
+            headers = {
+                'authorization': "Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX",
+                'content-type': "application/json",
+                'lang_code':'ar'
+            }
+            url = "https://api.tap.company/v2/invoices"
+            response = requests.request("POST", url, data=payload, headers=headers)
+            data = json.loads(response.text)
+            print('daaataaa', data, payload)
         return Response(response_serializer.data)
 
 
@@ -815,32 +911,35 @@ class ApproveOrderByClient(generics.UpdateAPIView):
         # if self.request.data['payment_authorized'] == True and current_order.payment_authorized == False:
         # if self.request.data['status'] == 'canceled':
         #     delete_all_related_order_providers(current_order)
-        if (self.request.data['payment_authorized'] == True and current_order.payment_authorized == False):
-                while order_sorted_providers:
-                    print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
-                    if order_sorted_providers.first().provider.is_available:
-                        serializer.save(provider=order_sorted_providers.first().provider, order_block_start=order_sorted_providers.first().order_block_start, order_block_end=order_sorted_providers.first().order_block_end, status='sent_to_provider')
-                        OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
-                        break
+        print(type(self.request.data), self.request.data.keys())
+        if ('payment_authorized' in self.request.data.keys()):
+            if( self.request.data['payment_authorized'] == True and current_order.payment_authorized == False):
+                    while order_sorted_providers:
+                        print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
+                        if order_sorted_providers.first().provider.is_available:
+                            serializer.save(provider=order_sorted_providers.first().provider, order_block_start=order_sorted_providers.first().order_block_start, order_block_end=order_sorted_providers.first().order_block_end, status='sent_to_provider')
+                            OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+                            break
+                        else:
+                            OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+                            order_sorted_providers = current_order.order_possible_providers.all().order_by('-importance')
+                            # order.save()
                     else:
-                        OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
-                        order_sorted_providers = current_order.order_possible_providers.all().order_by('-importance')
-                        # order.save()
-                else:
-                    serializer.save(provider=None, order_block_start=None, order_block_end=None)
-                    print('No Possible Providers! Assign manually')
-                    if current_order.operator:
-                        sendSMS(current_order.custom_id, current_order.operator.user.phone_number,
-                                "يتطلب تعيين مقدم الخدمة يدويًا",
-                                "must be assigned manually")
-                    else:
-                        for operation_profile in OperationProfile.objects.all():
-                            if operation_profile.is_available is True:
-                                print('operation_profile', operation_profile.user.phone_number)
-                                sendSMS(current_order.custom_id, operation_profile.user.phone_number,
-                                        "يتطلب تعيين مقدم الخدمة يدويًا",
-                                        "must be assigned manually")
-
+                        serializer.save(provider=None, order_block_start=None, order_block_end=None)
+                        print('No Possible Providers! Assign manually')
+                        if current_order.operator:
+                            sendSMS(current_order.custom_id, current_order.operator.user.phone_number,
+                                    "يتطلب تعيين مقدم الخدمة يدويًا",
+                                    "must be assigned manually")
+                        else:
+                            for operation_profile in OperationProfile.objects.all():
+                                if operation_profile.is_available is True:
+                                    print('operation_profile', operation_profile.user.phone_number)
+                                    sendSMS(current_order.custom_id, operation_profile.user.phone_number,
+                                            "يتطلب تعيين مقدم الخدمة يدويًا",
+                                            "must be assigned manually")
+        else:
+            serializer.save()
 
 
 # def send_order_to_provider(order):
@@ -954,7 +1053,7 @@ def sendSMS(order_number, phone_number, arabic_text, english_text):
 #             try:
 #                 url = "https://api.tap.company/v2/authorize/" + paymentId
 #                 payload = "{}"
-#                 headers = {'authorization': 'Bearer sk_test_g5nBLfJUcuVE9mkTKezvlxMF'}
+#                 headers = {'authorization': 'Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX'}
 #                 response = requests.request("GET", url, data=payload, headers=headers)
 #             except Exception as e:
 #                 print('errror', e)
