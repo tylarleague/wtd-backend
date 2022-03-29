@@ -402,7 +402,7 @@ def create_order_providers(order, from_location_lat, from_location_lng,to_locati
             add_provider = True
             print('currentProvider for currentOrWithinRange', currentProvider, "-", currentOrgWithinRange)
             provider_orders_for_that_day = currentProvider.provider_related_orders.filter(
-                Q(order_date=order.order_date) & Q(approved_by_provider=True) & Q(approved_by_client=True))
+                Q(order_date=order.order_date) & Q(approved_by_client=True) & Q(payment_authorized=True))
             print('provider_orders_for_that_day', provider_orders_for_that_day)
             if provider_orders_for_that_day.exists():
                 for order_of_provider in provider_orders_for_that_day:
