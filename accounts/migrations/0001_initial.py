@@ -88,7 +88,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
                 ('lat', models.FloatField(blank=True, null=True)),
-                # ('lng', models.FloatField(blank=True, null=True)),
+                ('lng', models.FloatField(blank=True, null=True)),
                 ('percentage', models.IntegerField(default=70)),
             ],
         ),
