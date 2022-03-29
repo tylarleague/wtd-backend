@@ -115,6 +115,7 @@ class Order(models.Model):
     is_discharged = models.BooleanField(null=True, blank=True)
     order_block_start = models.TimeField(null=True, blank=True)
     order_block_end = models.TimeField(null=True, blank=True)
+    send_sms = models.BooleanField(default=True)
     history = HistoricalRecords()
 
     # models.ForeignKey(subjects, blank=True, null=True)
