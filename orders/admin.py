@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from orders.models import Order, Invoice, ExtraServices, AmbReport, Region, RegionPoint, CityPoint, City, SpecialLocationPoint, SpecialLocation
+from orders.models import Order, Invoice, ExtraServices, AmbReport, Region, RegionPoint, CityPoint, City, SpecialLocationPoint, SpecialLocation, OrderPossibleProvider
 
 # admin.site.register(Order)
 admin.site.register(Invoice)
@@ -13,6 +13,7 @@ admin.site.register(City)
 admin.site.register(CityPoint)
 admin.site.register(SpecialLocation)
 admin.site.register(SpecialLocationPoint)
+admin.site.register(OrderPossibleProvider)
 
 
 

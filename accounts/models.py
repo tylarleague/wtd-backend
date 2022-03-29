@@ -1,5 +1,5 @@
 """Declare models for YOUR_APP app."""
-
+# from orders.models import City, Region
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator
 from django.db import models
@@ -73,7 +73,8 @@ class User(AbstractUser):
 class Organization(models.Model):
     # user = models.OneToOneField(User, related_name="user_provider_profile", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    location = JSONField(null=True, blank=True)
+    lat = models.FloatField(null=True, blank=True)
+    lng = models.FloatField(null=True, blank=True)
     percentage = models.IntegerField(default=70)
 
     def __str__(self):
@@ -94,13 +95,16 @@ class OperationProfile(models.Model):
 
 class ProviderProfile(models.Model):
     user = models.OneToOneField(User, related_name="user_provider_profile", on_delete=models.CASCADE)
-    approval = models.CharField(max_length=30, blank=True, null=True)
     is_available = models.BooleanField(default=True)
     organization = models.ForeignKey(
         Organization, related_name="organization_providers", on_delete=models.CASCADE, blank=True, null=True)
+    # region = models.ForeignKey(
+    #     Region, related_name="region_providers", on_delete=models.CASCADE, blank=True, null=True)
+    # city = models.ForeignKey(
+    #     City, related_name="city_providers", on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return str(self.user.phone_number) + " - " + str(self.user.name)
+        return str(self.user.phone_number) + " - " + str(self.user.name) + " - " + str(self.organization)
 
 class Person(models.Model):
     profile = models.ForeignKey(
@@ -140,14 +144,20 @@ def create_user_profile(sender, instance, created, **kwargs):
             ProviderProfile.objects.create(user=instance)
 
 # MAYBE i need to update this similar to top hasattr
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def save_user_profile(sender, instance, **kwargs):
-    if instance.isClient:
-        instance.user_client_profile.save()
-    if instance.isOperation:
-        instance.user_operation_profile.save()
-    if instance.isProvider:
-        instance.user_provider_profile.save()
+# @receiver(post_save, sender=settings.AUTH_USER_MODEL)
+# def save_user_profile(sender, instance, **kwargs):
+#     if instance.isClient:
+#         instance.user_client_profile.save()
+#     if instance.isOperation:
+#         instance.user_operation_profile.save()
+#     if instance.isProvider:
+#         instance.user_provider_profile.save()
+
+@receiver(post_save, sender=ProviderProfile)
+def create_provider_profile(sender, instance, **kwargs):
+        # if not instance.user_provider_profile:
+        instance.user.isProvider = True
+        instance.user.save()
 
 
 class SpecialAccounts(models.Model):
