@@ -951,12 +951,13 @@ class ActionOrderByOperation(generics.UpdateAPIView):
         current_order = Order.objects.get(id=self.kwargs['pk'])
         print('payment_authorized of current_order', current_order.payment_authorized)
         if self.request.data['status'] == 'canceled':
-            if self.request.data['provider']:
-                print('I am suppose to send sms to provider', current_order.provider.user.phone_number)
-                sendSMS(current_order.custom_id, current_order.provider.user.phone_number, getattr(config, 'SMS_PROVIDER_ORDER_CANCELLED_AR'),
+            print('I am suppose to send sms to provider', current_order.provider.user.phone_number)
+            sendSMS(current_order.custom_id, current_order.provider.user.phone_number, getattr(config, 'SMS_PROVIDER_ORDER_CANCELLED_AR'),
                         getattr(config, 'SMS_PROVIDER_ORDER_CANCELLED_EN'))
-                serializer.save(provider=None, order_block_start=None, order_block_end=None)
+            serializer.save(provider=None, order_block_start=None, order_block_end=None)
             delete_all_related_order_providers(current_order)
+        else:
+            serializer.save()
 
 
 def delete_all_related_order_providers(order):
