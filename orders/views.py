@@ -357,11 +357,11 @@ class CreateOrderView(generics.CreateAPIView):
         if (request.data['isCreatedInProvider']):
             requestBody = {
                 "draft": False,
-                "due": int((datetime.now()+ timedelta(minutes = 2)).timestamp()* 1000),
-                "expiry": 1679999977008,
-                "description": "test invoice",
+                "due": int((datetime.now()+ timedelta(minutes = 1)).timestamp()* 1000),
+                "expiry": int((datetime.now()+ timedelta(hours= 24)).timestamp()* 1000),
+                "description": "delivery on "+ str(order.order_date)+ " invoice",
                 "mode": "INVOICE",
-                "note": "test note",
+                "note":  "delivery on "+ str(order.order_date),
                 "notifications": {
                     "channels": [
                         "SMS",
@@ -447,7 +447,6 @@ class CreateOrderView(generics.CreateAPIView):
             url = "https://api.tap.company/v2/invoices"
             response = requests.request("POST", url, data=payload, headers=headers)
             data = json.loads(response.text)
-            print('daaataaa', data, payload)
         return Response(response_serializer.data)
 
 
@@ -498,7 +497,7 @@ def create_order_providers(order, from_location_lat, from_location_lng,to_locati
             add_provider = True
             print('currentProvider for currentOrWithinRange', currentProvider, "-", currentOrgWithinRange)
             provider_orders_for_that_day = currentProvider.provider_related_orders.filter(
-                Q(order_date=order.order_date) & Q(approved_by_provider=True) & Q(approved_by_client=True))
+                Q(order_date=order.order_date) & Q(approved_by_client=True) & Q(payment_authorized=True))
             print('provider_orders_for_that_day', provider_orders_for_that_day)
             if provider_orders_for_that_day.exists():
                 for order_of_provider in provider_orders_for_that_day:
