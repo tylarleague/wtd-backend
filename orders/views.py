@@ -31,6 +31,8 @@ from unifonicnextgen.unifonicnextgen_client import UnifonicnextgenClient
 from unifonicnextgen.configuration import Configuration
 from unifonicnextgen.exceptions.api_exception import APIException
 import heapq
+from constance import config
+
 
 basic_auth_user_name = 'e637a3df-8da4-4cd2-b524-5a5409e811f9'
 basic_auth_password = '0UpBuW8KAxwOWkJn8Y7lKBbrFEz4aTFn87z3kFwwpWhFB3XJAec2Dn4BTeCakSlkdhGAfCbxkWK'
@@ -178,13 +180,6 @@ class CreateOrderView(generics.CreateAPIView):
                 print('centroid(poly_region)', centroid(poly_region[1]))
                 allRegionsCentroids.append(centroid(poly_region[1]))
                 allRegionsCentroidsWithRegions.append((poly_region[0], centroid(poly_region[1])))
-                # f1 = Feature(geometry=Point([28.96991729736328, 41.01190001748873]))
-                # f2 = Feature(geometry=Point([28.948459, 41.024204]))
-                # f3 = Feature(geometry=Point([28.938674, 41.013324]))
-                # fc = FeatureCollection([f1, f2, f3])
-                # t = Feature(geometry=Point([28.973865, 41.011122]))
-                # print(json.dumps(nearest_point(t, fc), indent=2, sort_keys=True))
-                # allRegionsCentroids.append([centroid(poly_region), ])
             fc = FeatureCollection(allRegionsCentroids)
             print('nearest_point(from_point, fc)', nearest_point(from_point, fc))
             print('allRegionsCentroidsWithRegions', allRegionsCentroidsWithRegions)
@@ -218,11 +213,11 @@ class CreateOrderView(generics.CreateAPIView):
             print('1 special locations to_special_location', order.to_special_location)
             if (serializer.data['order_type'] == "ROUND_TRIP"):
                 print("is round trip")
-                cost = order.to_special_location.special_price + ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * serializer.data[
+                cost = order.to_special_location.special_price + ((distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')) * getattr(config, 'ROUND_TRIP_RATIO') + getattr(config, 'WAITING_PRICE') * serializer.data[
                     'waiting_time']
             else:
                 print("not round trip")
-                cost = order.to_special_location.special_price + (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+                cost = order.to_special_location.special_price + (distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')
         elif order.from_special_location and order.to_city == order.from_special_location.city:
             print('1 special locations from_special_location', order.from_special_location)
             if (serializer.data['order_type'] == "ROUND_TRIP"):
@@ -235,21 +230,21 @@ class CreateOrderView(generics.CreateAPIView):
             print('1 special locations to_special_location', order.from_special_location)
             if (serializer.data['order_type'] == "ROUND_TRIP"):
                 print("is round trip")
-                cost = order.from_special_location.special_price + ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * serializer.data[
+                cost = order.from_special_location.special_price + ((distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')) * getattr(config, 'ROUND_TRIP_RATIO') + getattr(config, 'WAITING_PRICE') * serializer.data[
                     'waiting_time']
             else:
                 print("not round trip")
-                cost = order.from_special_location.special_price + (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+                cost = order.from_special_location.special_price + (distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')
         else:
             is_flat_rate = False
             print('No Special Locations')
             if (serializer.data['order_type'] == "ROUND_TRIP"):
                 print("is round trip")
-                cost = ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * serializer.data[
+                cost = ((distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')) * getattr(config, 'ROUND_TRIP_RATIO') + getattr(config, 'WAITING_PRICE') * serializer.data[
                     'waiting_time']
             else:
                 print("not round trip")
-                cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+                cost = (distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')
         print('==========================================')
         if is_flat_rate:
             cost_after_vat = cost
@@ -279,82 +274,11 @@ class CreateOrderView(generics.CreateAPIView):
         print('===========Automate to Provider============')
 
         create_order_providers(order, from_location['lat'], from_location['lng'], to_location['lat'], to_location['lng'], duration_in_minutes)
-        # from_location['lat']
-        # from_location['lng']
-        # order
-        #
-        # from_location_lat = from_location['lat']
-        # from_location_lng = from_location['lng']
-        # center_circle_from_location = Feature(geometry=Point((from_location_lat, from_location_lng)))
-        # circle_of_from_location = circle(center_circle_from_location, radius=30, steps=10, units='km')
-        # allOrganizations = Organization.objects.all()
-        # orgsWithinRange = []
-        # for currentOrg in allOrganizations:
-        #     print('testing OrgLocation', currentOrg)
-        #     currentOrgLocation = Point([currentOrg.lat, currentOrg.lng])
-        #     if boolean_point_in_polygon(currentOrgLocation, circle_of_from_location):
-        #         print('ORG WITHIN RANGE', currentOrgLocation)
-        #         org_to_pickup_distance = gmaps.distance_matrix((currentOrg.lat, currentOrg.lng),
-        #                                                        (from_location['lat'], from_location['lng']),
-        #                                                        mode='driving')
-        #         org_to_pickup_duration_in_minutes = round(
-        #             org_to_pickup_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
-        #         my_arrival_time_temp = datetime.strptime(str(order.arrival_time), "%H:%M:%S")
-        #         pickup_dropoff_operation_duration = 20
-        #         full_duration_before = org_to_pickup_duration_in_minutes + float(duration_in_minutes) + pickup_dropoff_operation_duration
-        #         time_block_start = (
-        #                 my_arrival_time_temp - timedelta(minutes=full_duration_before)).time()
-        #         if order.order_type == 'ONE_WAY':
-        #             dropoff_to_org_distance = gmaps.distance_matrix((to_location['lat'], to_location['lng']),
-        #                                                             (currentOrg.lat, currentOrg.lng), mode='driving')
-        #             dropoff_to_org_duration_in_minutes = round(
-        #                 dropoff_to_org_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
-        #             time_block_end = (
-        #                     my_arrival_time_temp + timedelta(minutes=dropoff_to_org_duration_in_minutes)).time()
-        #         else:
-        #             full_duration_after = (order.waiting_time * 60) + pickup_dropoff_operation_duration + float(duration_in_minutes) + org_to_pickup_duration_in_minutes
-        #             time_block_end = (
-        #                     my_arrival_time_temp + timedelta(minutes=full_duration_after)).time()
-        #
-        #         orgtuple = (currentOrg, org_to_pickup_duration_in_minutes, time_block_start, time_block_end)
-        #         orgsWithinRange.append(orgtuple)
-        # print('allOrganizations', allOrganizations, len(allOrganizations))
-        # print('orgsWithinRange', orgsWithinRange, len(orgsWithinRange))
-        # sortedOrgsWithinRange = sorted(orgsWithinRange, key=lambda distance_from_location: distance_from_location[1])
-        # print('sortedOrgsWithinRange', sortedOrgsWithinRange, len(sortedOrgsWithinRange))
-        # for currentOrgWithinRange in sortedOrgsWithinRange:
-        #     for currentProvider in currentOrgWithinRange[0].organization_providers.all():
-        #         add_provider = True
-        #         print('currentProvider for currentOrWithinRange', currentProvider, "-", currentOrgWithinRange)
-        #         provider_orders_for_that_day = currentProvider.provider_related_orders.filter(
-        #             Q(order_date=order.order_date) & Q(approved_by_provider=True) & Q(approved_by_client=True))
-        #         print('provider_orders_for_that_day', provider_orders_for_that_day)
-        #         if provider_orders_for_that_day.exists():
-        #             for order_of_provider in provider_orders_for_that_day:
-        #                 print('order_of_provider', order_of_provider.arrival_time, currentOrgWithinRange[2], currentOrgWithinRange[3])
-        #                 if time_in_range(currentOrgWithinRange[2], currentOrgWithinRange[3], order_of_provider.arrival_time):
-        #                     print('inside time range!')
-        #                     add_provider = False
-        #             if add_provider:
-        #                 print('not inside time range, I will add provider')
-        #                 OrderPossibleProvider.objects.create(order=order, provider=currentProvider,
-        #                                                      importance=create_provider_score(currentOrgWithinRange[1],
-        #                                                                                       currentOrgWithinRange[
-        #                                                                                           0].percentage))
-        #         else:
-        #             print('no orders that day, so I will add provider')
-        #             OrderPossibleProvider.objects.create(order=order, provider=currentProvider, importance=create_provider_score(currentOrgWithinRange[1],
-        #                                                                                 currentOrgWithinRange[
-        #                                                                                     0].percentage))
-        # order_sorted_providers= order.order_possible_providers.all().order_by('-importance')
-        # print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
-
-
         print('===========FINSH Automate to Provider============')
         response_serializer = GetOrdersSerializer(order)
         print(str(datetime.now().timestamp()),'here')
 
-        if (request.data['isCreatedInProvider']):
+        if ('isCreatedInProvider' in request.data.keys() and request.data['isCreatedInProvider']):
             requestBody = {
                 "draft": False,
                 "due": int((datetime.now()+ timedelta(minutes = 1)).timestamp()* 1000),
@@ -454,7 +378,7 @@ class CreateOrderView(generics.CreateAPIView):
 def create_order_providers(order, from_location_lat, from_location_lng,to_location_lat, to_location_lng,duration_in_minutes):
     gmaps = googlemaps.Client(key='AIzaSyDVWqaOxUtds5e2z9OBWf79q5IASU7uBIs')
     center_circle_from_location = Feature(geometry=Point((from_location_lat, from_location_lng)))
-    circle_of_from_location = circle(center_circle_from_location, radius=30, steps=10, units='km')
+    circle_of_from_location = circle(center_circle_from_location, radius=getattr(config, 'PICKUP_SEARCH_RADIUS'), steps=10, units='km')
     allOrganizations = Organization.objects.all()
     orgsWithinRange = []
     for currentOrg in allOrganizations:
@@ -468,7 +392,7 @@ def create_order_providers(order, from_location_lat, from_location_lng,to_locati
             org_to_pickup_duration_in_minutes = round(
                 org_to_pickup_distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0)
             my_arrival_time_temp = datetime.strptime(str(order.arrival_time), "%H:%M:%S")
-            pickup_dropoff_operation_duration = 20
+            pickup_dropoff_operation_duration = getattr(config, 'PICKUP_DROPOFF_OPERATION_IN_MINUTES')
             full_duration_before = org_to_pickup_duration_in_minutes + float(
                 duration_in_minutes) + pickup_dropoff_operation_duration
             time_block_start = (
@@ -695,11 +619,11 @@ def calculateCost_view(request):
             print('1 special locations to_special_location', final_to_special)
             if (request.data['order_type'] == "ROUND_TRIP"):
                 print("is round trip")
-                cost = final_to_special.special_price + ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * int(request.data[
+                cost = final_to_special.special_price + ((distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')) * getattr(config, 'ROUND_TRIP_RATIO') + getattr(config, 'WAITING_PRICE') * int(request.data[
                     'waiting_time'])
             else:
                 print("not round trip")
-                cost = final_to_special.special_price + (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+                cost = final_to_special.special_price + (distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')
         elif final_from_special and final_to_city == final_from_special.city:
             print('1 special locations from_special_location', final_from_special)
             if (request.data['order_type'] == "ROUND_TRIP"):
@@ -712,21 +636,21 @@ def calculateCost_view(request):
             print('1 special locations to_special_location', final_from_special)
             if (request.data['order_type'] == "ROUND_TRIP"):
                 print("is round trip")
-                cost = final_from_special.special_price + ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * int(request.data[
+                cost = final_from_special.special_price + ((distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')) * getattr(config, 'ROUND_TRIP_RATIO') + getattr(config, 'WAITING_PRICE') * int(request.data[
                     'waiting_time'])
             else:
                 print("not round trip")
-                cost = final_from_special.special_price + (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+                cost = final_from_special.special_price + (distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')
         else:
             is_flat_rate = False
             print('No Special Locations')
             if (request.data['order_type'] == "ROUND_TRIP"):
                 print("is round trip")
-                cost = ((distance_in_kilo * 5) + (duration_in_minutes * 3) + 200) * 1.5 + 50 * int(request.data[
+                cost = ((distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')) * getattr(config, 'ROUND_TRIP_RATIO') + getattr(config, 'WAITING_PRICE') * int(request.data[
                     'waiting_time'])
             else:
                 print("not round trip")
-                cost = (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+                cost = (distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')
         print('==========================================')
         if is_flat_rate:
             cost_after_vat = cost
@@ -780,7 +704,7 @@ def calculateCost_viewold(request):
         print('distance', type(distance))
         distance_in_kilo = round(distance['rows'][0]['elements'][0]['distance']['value'] / 1000, 1);
         duration_in_minutes = round(distance['rows'][0]['elements'][0]['duration']['value'] / 60, 0);
-        cost= (distance_in_kilo * 5) + (duration_in_minutes * 3) + 200
+        cost= (distance_in_kilo * getattr(config, 'KILO_PRICE')) + (duration_in_minutes * getattr(config, 'MINUTE_PRICE')) + getattr(config, 'STARTING_PRICE')
         print('distance_in_kilo', distance_in_kilo)
         print('duration_in_minutes', duration_in_minutes)
         cost_after_vat = (115 * cost) / 100
@@ -928,15 +852,15 @@ class ApproveOrderByClient(generics.UpdateAPIView):
                         print('No Possible Providers! Assign manually')
                         if current_order.operator:
                             sendSMS(current_order.custom_id, current_order.operator.user.phone_number,
-                                    "يتطلب تعيين مقدم الخدمة يدويًا",
-                                    "must be assigned manually")
+                                    getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_AR'),
+                                    getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_EN'))
                         else:
                             for operation_profile in OperationProfile.objects.all():
                                 if operation_profile.is_available is True:
                                     print('operation_profile', operation_profile.user.phone_number)
                                     sendSMS(current_order.custom_id, operation_profile.user.phone_number,
-                                            "يتطلب تعيين مقدم الخدمة يدويًا",
-                                            "must be assigned manually")
+                                            getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_AR'),
+                                            getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_EN'))
         else:
             serializer.save()
 
@@ -1004,15 +928,15 @@ class ActionOrderByProvider(generics.UpdateAPIView):
                 serializer.save(provider=None, order_block_start=None, order_block_end=None)
                 print('No Possible Providers! Assign manually')
                 if current_order.operator:
-                    sendSMS(current_order.custom_id, current_order.operator.user.phone_number, "يتطلب تعيين مقدم الخدمة يدويًا",
-                            "must be assigned manually")
+                    sendSMS(current_order.custom_id, current_order.operator.user.phone_number, getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_AR'),
+                            getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_EN'))
                 else:
                     for operation_profile in OperationProfile.objects.all():
                         if operation_profile.is_available is True:
                             print('operation_profile', operation_profile.user.phone_number)
                             sendSMS(current_order.custom_id, operation_profile.user.phone_number,
-                                    "يتطلب تعيين مقدم الخدمة يدويًا",
-                                    "must be assigned manually")
+                                    getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_AR'),
+                                    getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_EN'))
 
 
 class ActionOrderByOperation(generics.UpdateAPIView):
@@ -1025,6 +949,11 @@ class ActionOrderByOperation(generics.UpdateAPIView):
         current_order = Order.objects.get(id=self.kwargs['pk'])
         print('payment_authorized of current_order', current_order.payment_authorized)
         if self.request.data['status'] == 'canceled':
+            if self.request.data['provider']:
+                print('I am suppose to send sms to provider', current_order.provider.user.phone_number)
+                sendSMS(current_order.custom_id, current_order.provider.user.phone_number, getattr(config, 'SMS_PROVIDER_ORDER_CANCELLED_AR'),
+                        getattr(config, 'SMS_PROVIDER_ORDER_CANCELLED_EN'))
+                serializer.save(provider=None, order_block_start=None, order_block_end=None)
             delete_all_related_order_providers(current_order)
 
 
