@@ -278,7 +278,7 @@ class CreateOrderView(generics.CreateAPIView):
         response_serializer = GetOrdersSerializer(order)
         print(str(datetime.now().timestamp()),'here')
 
-        if ('isCreatedInProvider' in request.data.keys() and request.data['isCreatedInProvider']):
+        if ('isCreatedInOperation' in request.data.keys() and request.data['isCreatedInOperation']):
             requestBody = {
                 "draft": False,
                 "due": int((datetime.now()+ timedelta(minutes = 1)).timestamp()* 1000),
