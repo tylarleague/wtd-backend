@@ -861,6 +861,8 @@ class ApproveOrderByClient(generics.UpdateAPIView):
                                     sendSMS(current_order.custom_id, operation_profile.user.phone_number,
                                             getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_AR'),
                                             getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_EN'))
+            else:
+                serializer.save()
         else:
             serializer.save()
 
