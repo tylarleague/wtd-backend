@@ -276,9 +276,8 @@ class CreateOrderView(generics.CreateAPIView):
         create_order_providers(order, from_location['lat'], from_location['lng'], to_location['lat'], to_location['lng'], duration_in_minutes)
         print('===========FINSH Automate to Provider============')
         response_serializer = GetOrdersSerializer(order)
-        print(str(datetime.now().timestamp()),'here')
 
-        if ('isCreatedInOperation' in request.data.keys() and request.data['isCreatedInOperation']):
+        if ('isCreatedInOperation' in request.data.keys() and request.data['isCreatedInOperation'] and order.send_sms):
             requestBody = {
                 "draft": False,
                 "due": int((datetime.now()+ timedelta(minutes = 1)).timestamp()* 1000),

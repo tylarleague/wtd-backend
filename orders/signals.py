@@ -42,7 +42,7 @@ def announce_status_change(sender, instance, created, **kwargs):
     if created:
             print('SIGNALS: created new order', instance.status)
             if instance.payment_authorized:
-                if getattr(config, 'ALLOW_SMS_SYSTEM') == True:
+                if getattr(config, 'ALLOW_SMS_SYSTEM') == True and instance.send_sms:
                     print('I am suppose to send sms to client', instance.owner.user.phone_number)
                     sendSMS(instance.custom_id, instance.owner.user.phone_number, getattr(config, 'SMS_CLIENT_NEW_ORDER_AR'),
                             getattr(config, 'SMS_CLIENT_NEW_ORDER_EN'))
@@ -60,8 +60,9 @@ def announce_status_change(sender, instance, created, **kwargs):
                             print('operation_profile', operation_profile.user.phone_number)
                             sendSMS(instance.custom_id, operation_profile.user.phone_number, getattr(config, 'SMS_OPERATION_NEW_ORDER_AR'),
                                     getattr(config, 'SMS_OPERATION_NEW_ORDER_EN'))
-                print('I am suppose to send sms to client', instance.owner.user.phone_number)
-                sendSMS(instance.custom_id, instance.owner.user.phone_number, getattr(config, 'SMS_CLIENT_NEW_ORDER_AR'), getattr(config, 'SMS_CLIENT_NEW_ORDER_EN'))
+                if instance.send_sms:
+                    print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                    sendSMS(instance.custom_id, instance.owner.user.phone_number, getattr(config, 'SMS_CLIENT_NEW_ORDER_AR'), getattr(config, 'SMS_CLIENT_NEW_ORDER_EN'))
         elif instance.status == 'sent_to_provider' and instance.payment_authorized:
             if getattr(config, 'ALLOW_SMS_SYSTEM') == True:
                 print('I am suppose to send sms to provider', instance.provider.user.phone_number)
@@ -81,9 +82,9 @@ def announce_status_change(sender, instance, created, **kwargs):
         elif instance.status == 'scheduled':
             if getattr(config, 'ALLOW_SMS_SYSTEM') == True:
                 # SMS_OPERATION_PROVIDER_ACCEPTED_AR
-
-                print('I am suppose to send sms to client', instance.owner.user.phone_number)
-                sendSMS(instance.custom_id, instance.owner.user.phone_number, getattr(config, 'SMS_CLIENT_ORDER_APPROVED_AR'), getattr(config, 'SMS_CLIENT_ORDER_APPROVED_EN'))
+                if instance.send_sms:
+                    print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                    sendSMS(instance.custom_id, instance.owner.user.phone_number, getattr(config, 'SMS_CLIENT_ORDER_APPROVED_AR'), getattr(config, 'SMS_CLIENT_ORDER_APPROVED_EN'))
 
                 if instance.operator:
                     sendSMS(instance.custom_id, instance.operator.user.phone_number, getattr(config, 'SMS_OPERATION_PROVIDER_ACCEPTED_AR'),
@@ -106,14 +107,15 @@ def announce_status_change(sender, instance, created, **kwargs):
                             print('operation_profile', operation_profile.user.phone_number)
                             sendSMS(instance.custom_id, operation_profile.user.phone_number, getattr(config, 'SMS_OPERATION_PROVIDER_STARTED_AR'),
                                     getattr(config, 'SMS_OPERATION_PROVIDER_STARTED_EN'))
-                print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                if instance.send_sms:
+                    print('I am suppose to send sms to client', instance.owner.user.phone_number)
 
-                sendSMS(instance.custom_id, instance.owner.user.phone_number, getattr(config, 'SMS_CLIENT_PROVIDER_STARTED_AR'),
-                        getattr(config, 'SMS_CLIENT_PROVIDER_STARTED_EN'))
+                    sendSMS(instance.custom_id, instance.owner.user.phone_number, getattr(config, 'SMS_CLIENT_PROVIDER_STARTED_AR'),
+                            getattr(config, 'SMS_CLIENT_PROVIDER_STARTED_EN'))
         elif instance.status == 'canceled':
 
             if getattr(config, 'ALLOW_SMS_SYSTEM') == True:
-                if instance.owner:
+                if instance.owner and instance.send_sms:
                     print('I am suppose to send sms to client', instance.owner.user.phone_number)
                     sendSMS(instance.custom_id, instance.owner.user.phone_number, getattr(config, 'SMS_CLIENT_ORDER_CANCELLED_AR'),
                             getattr(config, 'SMS_CLIENT_ORDER_CANCELLED_EN'))
@@ -134,9 +136,10 @@ def announce_status_change(sender, instance, created, **kwargs):
                             print('operation_profile', operation_profile.user.phone_number)
                             sendSMS(instance.custom_id, operation_profile.user.phone_number, getattr(config, 'SMS_OPERATION_ORDER_DONE_AR'),
                                     getattr(config, 'SMS_OPERATION_ORDER_DONE_EN'))
-                print('I am suppose to send sms to client', instance.owner.user.phone_number)
-                sendSMS(instance.custom_id, instance.owner.user.phone_number, getattr(config, 'SMS_CLIENT_ORDER_DONE_AR'),
-                        getattr(config, 'SMS_CLIENT_ORDER_DONE_EN'))
+                if instance.send_sms:
+                    print('I am suppose to send sms to client', instance.owner.user.phone_number)
+                    sendSMS(instance.custom_id, instance.owner.user.phone_number, getattr(config, 'SMS_CLIENT_ORDER_DONE_AR'),
+                            getattr(config, 'SMS_CLIENT_ORDER_DONE_EN'))
         else:
             print('Unknown status at Signals')
 
@@ -188,7 +191,7 @@ def refundAmount(order):
             data = json.loads(response.text)
             print('refuuuund response daaataaa', data)
             print('payments before update', payments.tap_refund_id)
-            if data and data.id:
+            if 'id' in data.keys() and data['id']:
                 payments.tap_refund_id = data['id']
                 payments.status = "REFUND REQUEST"
                 payments.save()

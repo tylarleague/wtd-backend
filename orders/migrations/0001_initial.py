@@ -180,11 +180,6 @@ class Migration(migrations.Migration):
             field=models.TimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='historicalorder',
-            name='send_sms',
-            field=models.BooleanField(default=True),
-        ),
-        migrations.AddField(
             model_name='order',
             name='discharge_approval',
             field=models.FileField(blank=True, null=True, upload_to='discharge_approvals'),
@@ -228,11 +223,6 @@ class Migration(migrations.Migration):
             model_name='order',
             name='order_block_start',
             field=models.TimeField(blank=True, null=True),
-        ),
-        migrations.AddField(
-            model_name='order',
-            name='send_sms',
-            field=models.BooleanField(default=True),
         ),
         migrations.CreateModel(
             name='SpecialLocationPoint',
