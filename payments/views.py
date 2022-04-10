@@ -161,10 +161,10 @@ def add_pay_view(request):
                     "status":data['transactions'][0]['status'],
                     "amount":int(data['transactions'][0]['amount'])
         }
-        response2 = requests.request("POST", 'http://164.90.165.230:1234/payment/',
+        response2 = requests.request("POST", 'http://161.35.67.15:1234/payment/',
          data=json.dumps(payment),
          headers=innerHeader)
-        response3 = requests.request("PATCH", 'http://164.90.165.230:1234/order/client_action/'+request.GET.get('order_id'),
+        response3 = requests.request("PATCH", 'http://161.35.67.15:1234/order/client_action/'+request.GET.get('order_id'),
          data=json.dumps({"payment_authorized":True}),
          headers=innerHeader)
     return redirect('https://www.wtdcare.com/')
