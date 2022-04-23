@@ -112,6 +112,7 @@ class Order(models.Model):
     is_emergency= models.BooleanField(null=True, blank=True)
     is_contagious = models.BooleanField(null=True, blank=True)
     needs_oxygen = models.BooleanField(null=True, blank=True)
+    is_approved_by_operation = models.BooleanField(default=False)
     is_discharged = models.BooleanField(null=True, blank=True)
     order_block_start = models.TimeField(null=True, blank=True)
     order_block_end = models.TimeField(null=True, blank=True)

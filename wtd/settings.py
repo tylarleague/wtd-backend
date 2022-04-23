@@ -126,6 +126,10 @@ CONSTANCE_CONFIG = {
 
 
 
+    'SMS_OPERATION_AUTO_ASSIGN_AR': ('تم دفعه وتعيينه لمقدم خدمة', 'SMS sent to operation when system cannot send order to Provider Automatically', str),
+    'SMS_OPERATION_AUTO_ASSIGN_EN': ('has been paid for and assigned to provider', 'SMS sent to operation when system cannot send order to Provider Automatically', str),
+
+
 }
 
 # from constance import config

@@ -835,13 +835,44 @@ class ApproveOrderByClient(generics.UpdateAPIView):
         # if self.request.data['status'] == 'canceled':
         #     delete_all_related_order_providers(current_order)
         print(type(self.request.data), self.request.data.keys())
-        if ('payment_authorized' in self.request.data.keys()):
-            if( self.request.data['payment_authorized'] == True and current_order.payment_authorized == False):
+        if ('payment_authorized' in self.request.data.keys() or 'is_approved_by_operation' in self.request.data.keys() ):
+            if('payment_authorized' in self.request.data.keys()  and self.request.data['payment_authorized'] == True and current_order.payment_authorized == False and current_order.is_approved_by_operation):
                     while order_sorted_providers:
                         print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
                         if order_sorted_providers.first().provider.is_available:
                             serializer.save(provider=order_sorted_providers.first().provider, order_block_start=order_sorted_providers.first().order_block_start, order_block_end=order_sorted_providers.first().order_block_end, status='sent_to_provider')
                             OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+                            sendSMS(current_order.custom_id, current_order.operator.user.phone_number,
+                                    getattr(config, 'SMS_OPERATION_AUTO_ASSIGN_AR'),
+                                    getattr(config, 'SMS_OPERATION_AUTO_ASSIGN_EN'))
+                            break
+                        else:
+                            OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+                            order_sorted_providers = current_order.order_possible_providers.all().order_by('-importance')
+                            # order.save()
+                    else:
+                        serializer.save(provider=None, order_block_start=None, order_block_end=None)
+                        print('No Possible Providers! Assign manually')
+                        if current_order.operator:
+                            sendSMS(current_order.custom_id, current_order.operator.user.phone_number,
+                                    getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_AR'),
+                                    getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_EN'))
+                        else:
+                            for operation_profile in OperationProfile.objects.all():
+                                if operation_profile.is_available is True:
+                                    print('operation_profile', operation_profile.user.phone_number)
+                                    sendSMS(current_order.custom_id, operation_profile.user.phone_number,
+                                            getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_AR'),
+                                            getattr(config, 'SMS_OPERATION_NO_AUTO_ASSIGN_EN'))
+            elif ('is_approved_by_operation' in self.request.data.keys()  and self.request.data['is_approved_by_operation'] == True and current_order.is_approved_by_operation==False and current_order.payment_authorized ) :
+                    while order_sorted_providers:
+                        print('sortedProvidersFromDB', order_sorted_providers, len(order_sorted_providers))
+                        if order_sorted_providers.first().provider.is_available:
+                            serializer.save(provider=order_sorted_providers.first().provider, order_block_start=order_sorted_providers.first().order_block_start, order_block_end=order_sorted_providers.first().order_block_end, status='sent_to_provider')
+                            OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()
+                            sendSMS(current_order.custom_id, current_order.operator.user.phone_number,
+                                    getattr(config, 'SMS_OPERATION_AUTO_ASSIGN_AR'),
+                                    getattr(config, 'SMS_OPERATION_AUTO_ASSIGN_EN'))
                             break
                         else:
                             OrderPossibleProvider.objects.get(id=order_sorted_providers.first().id).delete()

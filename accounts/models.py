@@ -114,6 +114,7 @@ class Person(models.Model):
     birth_day = models.DateField(null=True, blank=True)
     nationality = models.CharField(max_length=30, blank=True, null=True)
     relation = models.CharField(max_length=30, blank=True, null=True)
+    is_deleted=models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.name) + " related to user: " + str(self.profile.user.phone_number) + " - " + str(self.profile.user.name)

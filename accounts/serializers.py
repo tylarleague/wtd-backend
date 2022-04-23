@@ -31,8 +31,13 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
 
 class ClientProfileSerializer(serializers.ModelSerializer):
-    related_persons = PersonSerializer(required=False, many=True, read_only=True)
+    related_persons = serializers.SerializerMethodField()
     user = SimpleUserSerializer()
+
+    def get_related_persons(self, profile):
+        qs = Person.objects.filter(is_deleted=False, profile=profile)
+        serializer = PersonSerializer(instance=qs, required=False, many=True, read_only=True)
+        return serializer.data
     class Meta:
         model = ClientProfile
         fields = "__all__"

@@ -68,7 +68,7 @@ class GetPersonsOfUserView(generics.ListAPIView):
         # pagination_class = PageNumberPagination
 
     def get_queryset(self):
-        return Person.objects.filter(profile=self.request.user.user_client_profile)
+        return Person.objects.filter(profile=self.request.user.user_client_profile, is_deleted=False)
 
     # GetAvailableProvider
 class GetAvailableProviderView(generics.ListAPIView):
@@ -126,7 +126,11 @@ class DeletePersonView(generics.DestroyAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = PersonSerializer
-    queryset = Person.objects.all()
+    def get_queryset(self):
+        person= Person.objects.get(id=self.kwargs['pk'], profile=self.request.user.user_client_profile)
+        person.is_deleted=True
+        person.save()
+        return person
 
 # class GetProvidelApproval(RetrieveAPIView):
 #     authentication_classes = [TokenAuthentication]
