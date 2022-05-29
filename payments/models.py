@@ -3,6 +3,7 @@ from accounts.models import ClientProfile, Person, ProviderProfile, User
 from orders.models import Order
 # Create your models here.
 
+
 class Payment(models.Model):
     order = models.ForeignKey(
         Order, related_name="order_related_payments", on_delete=models.CASCADE)
