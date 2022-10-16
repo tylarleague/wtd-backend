@@ -79,6 +79,8 @@ CONSTANCE_CONFIG = {
     'STARTING_PRICE': (200, 'Price to start trip when using WTD Equation', int),
     'KILO_PRICE': (5, 'Price of Kilometer when using WTD Equation', int),
     'MINUTE_PRICE':   (3, 'Price of Minute when using WTD Equation', int),
+    'WALAA_PLUS_PERCENTAGE':   (15, 'Percenatge for walaa plus discount', int),
+    'WALAA_PLUS_CODE':   ('AVVCC', 'The code for walaa plus discount', str),
     'WAITING_PRICE': (50, 'Price of HOUR when using WTD Equation and WAITING', int),
     'ROUND_TRIP_RATIO': (1.5, 'The ratio (Multiple) of 2 way trip', float),
     'PICKUP_SEARCH_RADIUS':  (40, 'When Auto Assigning order to provider, this is the radius of the circle to search for organizations', int),

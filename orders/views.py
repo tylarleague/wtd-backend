@@ -6,7 +6,7 @@ from rest_framework import views, permissions, status
 from googlemaps.distance_matrix import distance_matrix
 from rest_framework import viewsets, generics
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,  authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 import http.client
 from orders.models import Order, Invoice, ExtraServices, AmbReport, Region, RegionPoint, City, CityPoint, SpecialLocation, SpecialLocationPoint, OrderPossibleProvider
@@ -1022,3 +1022,28 @@ def sendSMS(order_number, phone_number, arabic_text, english_text):
 #                 print('errror', e)
 #                 return Response(e)
 #         return Response(response.text)
+
+@api_view(['POST', ])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def check_discount(request):
+    print(request.data)
+    code = getattr(config, 'WALAA_PLUS_CODE')
+    percentage = getattr(config, 'WALAA_PLUS_PERCENTAGE')
+    print(request.data)
+    if('code' in request.data and 'id' in request.data and code == request.data['code']):
+        order = Order.objects.get(id=request.data['id'])
+        order.order_related_invoice.cost = order.order_related_invoice.initial_cost - ( order.order_related_invoice.initial_cost * (percentage/100))
+        order.order_related_invoice.save()
+        response_serializer = GetOrdersSerializer(order)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
+    else:
+        if('id' in request.data):
+            order = Order.objects.get(id=request.data['id'])
+            order.order_related_invoice.cost = order.order_related_invoice.initial_cost
+            order.order_related_invoice.save()
+            response_serializer = GetOrdersSerializer(order)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
