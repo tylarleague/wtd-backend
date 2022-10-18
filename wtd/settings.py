@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     # 'channels',
     'simple_history',
     'payments',
+    'discounts',
     'constance.backends.database',
 ]
 

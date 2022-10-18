@@ -52,6 +52,7 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
     #Order Client
     path('order/create/', ordersViews.CreateOrderView.as_view()),
     path('order/userOrders/', ordersViews.GetOrdersOfUserView.as_view()),
+    path('order/discount/', ordersViews.check_discount),
     path('order/userDeletedDoneOrders/', ordersViews.GetDeletedDoneOrdersOfUserView.as_view()),
     path('order/client_action/<pk>', ordersViews.ApproveOrderByClient.as_view()),
     path('order/extraServices/', ordersViews.GetExtraServicesView.as_view()),
