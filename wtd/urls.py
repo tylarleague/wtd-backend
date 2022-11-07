@@ -88,4 +88,8 @@ urlpatterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + ro
     path('add/payment/', paymentsView.add_pay_view, name="pay"),
     path('order/payment_info/<str:paymentId>', paymentsView.paymentInfo_view.as_view(), name="payment_info"),
 
+    path('download_orders_data/',
+         ordersViews.download_orders_data, name='download_orders_data'),
+    path('download_invoices/',
+         ordersViews.download_invoices, name='download_invoices'),
 ]

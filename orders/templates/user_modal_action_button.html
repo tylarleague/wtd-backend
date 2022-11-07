@@ -1,0 +1,23 @@
+{% extends 'admin/change_list.html' %}
+
+{% block object-tools %}
+<div>
+
+
+    <form action="{% url 'download_orders_data'%}" method="POST">
+        {% csrf_token %}
+        <button
+            style="margin: 10px;border-radius: 15px;display: block;padding: 3px 12px;background: #095324;font-weight: 400;font-size: 20px;text-transform: uppercase;letter-spacing: 0.5px;color: #fff;border-width: 0.25px;"
+            type="submit">Download Orders</button>
+    </form>
+    <form action="{% url 'download_invoices'%}" method="POST">
+        {% csrf_token %}
+        <button
+            style="margin: 10px;border-radius: 15px;display: block;padding: 3px 12px;background: #095324;font-weight: 400;font-size: 20px;text-transform: uppercase;letter-spacing: 0.5px;color: #fff;border-width: 0.25px;"
+            type="submit">Download Invoices</button>
+    </form>
+
+</div>
+<br />
+{{ block.super }}
+{% endblock %}

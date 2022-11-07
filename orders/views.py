@@ -33,6 +33,9 @@ from unifonicnextgen.configuration import Configuration
 from unifonicnextgen.exceptions.api_exception import APIException
 import heapq
 from constance import config
+import csv
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 
 
 basic_auth_user_name = 'e637a3df-8da4-4cd2-b524-5a5409e811f9'
@@ -1141,3 +1144,54 @@ def check_discount(request):
             return Response(response_serializer.data, status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+def download_orders_data(request):
+    if request.method == "POST":
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="wtd_orders.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(
+            ['id', 'owner', 'patient', 'from_location', 'to_location', 'order_date', 'arrival_time', 'status', 'created_at',
+             'approved_by_client', 'payment_authorized', 'order_type', 'waiting_time', 'provider', 'operator',
+             'approved_by_provider', 'notes', 'health_institution', 'appointment_approval', 'discharge_approval',
+             'from_region', 'to_region', 'from_city', 'to_city', 'from_special_location', 'to_special_location',
+             'is_overweight', 'is_emergency', 'is_contagious', 'needs_oxygen', 'is_approved_by_operation',
+             'is_discharged', 'order_block_start', 'order_block_end', 'send_sms'])
+
+        AllOrders = Order.objects.all().values_list('id', 'owner', 'patient', 'from_location', 'to_location', 'order_date',
+                                                    'arrival_time', 'status', 'created_at', 'approved_by_client',
+                                                    'payment_authorized', 'order_type', 'waiting_time', 'provider',
+                                                    'operator', 'approved_by_provider', 'notes', 'health_institution',
+                                                    'appointment_approval', 'discharge_approval', 'from_region',
+                                                    'to_region', 'from_city', 'to_city', 'from_special_location',
+                                                    'to_special_location', 'is_overweight', 'is_emergency',
+                                                    'is_contagious', 'needs_oxygen', 'is_approved_by_operation',
+                                                    'is_discharged', 'order_block_start', 'order_block_end',
+                                                    'send_sms',)
+        for order in AllOrders:
+            writer.writerow(order)
+
+        return response
+
+
+
+@api_view(['POST'])
+def download_invoices(request):
+    if request.method == "POST":
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="wtd_orders.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(
+            ['id', 'order', 'distance_value', 'distance_text', 'duration_value', 'duration_text', 'cost', 'initial_cost'])
+
+        AllInvoices = Invoice.objects.all().values_list('id', 'order', 'distance_value', 'distance_text', 'duration_value',
+                                                    'duration_text', 'cost', 'initial_cost')
+        for invoice in AllInvoices:
+            writer.writerow(invoice)
+
+        return response
+
