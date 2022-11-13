@@ -352,7 +352,7 @@ class CreateOrderView(generics.CreateAPIView):
                     "currency": "SAR",
                     "items": [
                         {
-                            "amount":  myInv.cost,
+                            "amount":  myInv.cost - (myInv.cost*0.15),
                             "currency": "SAR",
                             "description": "delivery on " + str(order.order_date),
                             "discount": {
@@ -369,8 +369,8 @@ class CreateOrderView(generics.CreateAPIView):
                             "description": "Vat",
                             "name": "VAT",
                             "rate": {
-                                "type": "P",
-                                "value": 15
+                                "type": "F",
+                                "value": (myInv.cost*0.15)
                             }
                         }
                     ]
@@ -391,7 +391,6 @@ class CreateOrderView(generics.CreateAPIView):
             }
 
             payload = json.dumps(requestBody)
-
             headers = {
                 'authorization': "Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX",
                 'content-type': "application/json",
