@@ -308,6 +308,8 @@ class CreateOrderView(generics.CreateAPIView):
         response_serializer = GetOrdersSerializer(order)
 
         if ('isCreatedInOperation' in request.data.keys() and request.data['isCreatedInOperation'] and order.send_sms):
+            tax = float("{:.2f}".format((myInv.cost*0.15)))
+            amount = float("{:.2f}".format(myInv.cost - tax))
             requestBody = {
                 "draft": False,
                 "due": int((datetime.now() + timedelta(minutes=1)).timestamp() * 1000),
@@ -348,11 +350,11 @@ class CreateOrderView(generics.CreateAPIView):
                     }
                 },
                 "order": {
-                    "amount": myInv.cost,
+                    "amount": (amount+tax),
                     "currency": "SAR",
                     "items": [
                         {
-                            "amount":  myInv.cost - (myInv.cost*0.15),
+                            "amount": amount,
                             "currency": "SAR",
                             "description": "delivery on " + str(order.order_date),
                             "discount": {
@@ -370,7 +372,7 @@ class CreateOrderView(generics.CreateAPIView):
                             "name": "VAT",
                             "rate": {
                                 "type": "F",
-                                "value": (myInv.cost*0.15)
+                                "value": tax
                             }
                         }
                     ]
@@ -1176,7 +1178,6 @@ def download_orders_data(request):
         return response
 
 
-
 @api_view(['POST'])
 def download_invoices(request):
     if request.method == "POST":
@@ -1188,9 +1189,8 @@ def download_invoices(request):
             ['id', 'order', 'distance_value', 'distance_text', 'duration_value', 'duration_text', 'cost', 'initial_cost'])
 
         AllInvoices = Invoice.objects.all().values_list('id', 'order', 'distance_value', 'distance_text', 'duration_value',
-                                                    'duration_text', 'cost', 'initial_cost')
+                                                        'duration_text', 'cost', 'initial_cost')
         for invoice in AllInvoices:
             writer.writerow(invoice)
 
         return response
-
