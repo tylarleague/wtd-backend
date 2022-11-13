@@ -308,8 +308,6 @@ class CreateOrderView(generics.CreateAPIView):
         response_serializer = GetOrdersSerializer(order)
 
         if ('isCreatedInOperation' in request.data.keys() and request.data['isCreatedInOperation'] and order.send_sms):
-            tax = float("{:.2f}".format((myInv.cost*0.15)))
-            amount = float("{:.2f}".format(myInv.cost - tax))
             requestBody = {
                 "draft": False,
                 "due": int((datetime.now() + timedelta(minutes=1)).timestamp() * 1000),
@@ -350,11 +348,11 @@ class CreateOrderView(generics.CreateAPIView):
                     }
                 },
                 "order": {
-                    "amount": (amount+tax),
+                    "amount": float("{:.2f}".format(myInv.cost)),
                     "currency": "SAR",
                     "items": [
                         {
-                            "amount": amount,
+                            "amount": float("{:.2f}".format(myInv.cost)),
                             "currency": "SAR",
                             "description": "delivery on " + str(order.order_date),
                             "discount": {
@@ -364,16 +362,6 @@ class CreateOrderView(generics.CreateAPIView):
                             "image": "",
                             "name": "Delivery "+order.custom_id,
                             "quantity": 1
-                        }
-                    ],
-                    "tax": [
-                        {
-                            "description": "Vat",
-                            "name": "VAT",
-                            "rate": {
-                                "type": "F",
-                                "value": tax
-                            }
                         }
                     ]
                 },
@@ -402,6 +390,7 @@ class CreateOrderView(generics.CreateAPIView):
             response = requests.request(
                 "POST", url, data=payload, headers=headers)
             data = json.loads(response.text)
+            print(data)
         return Response(response_serializer.data)
 
 
