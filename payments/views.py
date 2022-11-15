@@ -14,6 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from payments.serializers import PaymentSerializer
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
+from decimal import Decimal
 
 # Create your views here.
 
@@ -26,8 +27,10 @@ class paymentInfo_view(views.APIView):
             try:
                 url = "https://api.tap.company/v2/charges/" + paymentId
                 payload = "{}"
-                headers = {'authorization': 'Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX'}
-                response = requests.request("GET", url, data=payload, headers=headers)
+                headers = {
+                    'authorization': 'Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX'}
+                response = requests.request(
+                    "GET", url, data=payload, headers=headers)
             except Exception as e:
                 print('errror', e)
                 return Response(e)
@@ -46,6 +49,7 @@ class paymentInfo_view(views.APIView):
             )
             print('payment', payment)
         return Response(response.text)
+
 
 @api_view(['POST', ])
 def pay_view(request):
@@ -114,9 +118,9 @@ def pay_view(request):
         payment = Payment.objects.create(
             order=order,
             user=user,
-            tap_token_id= tap_token_id,
-            tap_charge_id = data['id'],
-            status = data['status']
+            tap_token_id=tap_token_id,
+            tap_charge_id=data['id'],
+            status=data['status']
         )
         # serialized_obj = serializers.serialize('json', [payment, ])
         dict_obj = model_to_dict(payment)
@@ -131,40 +135,79 @@ def pay_view(request):
         }
         return Response(ResponseData)
 
+
 class CreatePaymentView(generics.CreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = PaymentSerializer
     queryset = Order.objects.all()
 
-@api_view(['POST', 'GET' ])
+
+@api_view(['POST', 'GET'])
 def add_pay_view(request):
     if request.method == 'GET':
         order = Order.objects.get(id=request.GET.get('order_id'))
         headers = {
-                'authorization': "Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX",
-                'content-type': "application/json",
-                'lang_code':'ar'
-            }
+            'authorization': "Bearer sk_live_snIkgH9ATpYZMLzl4Sw73rhX",
+            'content-type': "application/json",
+            'lang_code': 'ar'
+        }
         innerHeader = {
-                'Authorization': "Token "+ Token.objects.get(user_id=order.owner.user).key,
-                'content-type': "application/json",
-            }
+            'Authorization': "Token " + Token.objects.get(user_id=order.owner.user).key,
+            'content-type': "application/json",
+        }
         url = "https://api.tap.company/v2/invoices/"+request.GET.get('tap_id')
         response = requests.request("GET", url, data={}, headers=headers)
         data = json.loads(response.text)
         payment = {
-                    "order":request.GET.get('order_id'),
-                    "user":order.owner.user.id,
-                    "tap_id":data['transactions'][0]['id'],
-                    "tap_refund_id":data['transactions'][0]['id'],
-                    "status":data['transactions'][0]['status'],
-                    "amount":int(data['transactions'][0]['amount'])
+            "order": request.GET.get('order_id'),
+            "user": order.owner.user.id,
+            "tap_id": data['transactions'][0]['id'],
+            "tap_refund_id": data['transactions'][0]['id'],
+            "status": data['transactions'][0]['status'],
+            "amount": int(data['transactions'][0]['amount'])
         }
         response2 = requests.request("POST", 'http://161.35.67.15:1234/payment/',
-         data=json.dumps(payment),
-         headers=innerHeader)
+                                     data=json.dumps(payment),
+                                     headers=innerHeader)
         response3 = requests.request("PATCH", 'http://161.35.67.15:1234/order/client_action/'+request.GET.get('order_id'),
-         data=json.dumps({"payment_authorized":True}),
-         headers=innerHeader)
+                                     data=json.dumps(
+                                         {"payment_authorized": True}),
+                                     headers=innerHeader)
     return redirect('https://www.wtdcare.com/')
+
+
+@api_view(['POST'])
+def amwal_pay(request, **kwargs):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    order = Order.objects.get(
+        id=kwargs['id'], owner=request.user.user_client_profile)
+    url = "https://backend.sa.amwal.tech/transactions/" + \
+        body['amwal_ref']
+    response = requests.request("GET", url, data={})
+    data = json.loads(response.text)
+
+    if float(data['amount']) == float("{:2f}".format(order.order_related_invoice.cost)) and data['ref_id'] == str(order.id):
+        innerHeader = {
+            'Authorization': "Token " + Token.objects.get(user_id=order.owner.user).key,
+            'content-type': "application/json",
+        }
+        payment = {
+            "order": kwargs['id'],
+            "user": order.owner.user.id,
+            "tap_id": data['id'],
+            "tap_refund_id": data['id'],
+            "status": data['status'],
+            "amount": float(data['amount'])
+        }
+        response2 = requests.request("POST", 'http://161.35.67.15:1234/payment/',
+                                     data=json.dumps(payment),
+                                     headers=innerHeader)
+        response3 = requests.request("PATCH", 'http://161.35.67.15:1234/order/client_action/'+ kwargs['id'],
+                                     data=json.dumps(
+                                         {"payment_authorized": True}),
+                                     headers=innerHeader)
+        return Response({"status": True})
+
+    return Response({"status": False})
