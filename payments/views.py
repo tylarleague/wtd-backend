@@ -187,8 +187,7 @@ def amwal_pay(request, **kwargs):
         body['amwal_ref']
     response = requests.request("GET", url, data={})
     data = json.loads(response.text)
-
-    if float(data['amount']) == float("{:2f}".format(order.order_related_invoice.cost)) and data['ref_id'] == str(order.id):
+    if float(data['amount']) == float("{:2f}".format(order.order_related_invoice.cost)):
         innerHeader = {
             'Authorization': "Token " + Token.objects.get(user_id=order.owner.user).key,
             'content-type': "application/json",
